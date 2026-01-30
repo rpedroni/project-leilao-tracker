@@ -33,15 +33,21 @@ Busca diária de leilões de imóveis em Curitiba/Grande Curitiba, enviando resu
 ## Output
 
 ### WhatsApp (self-chat por enquanto)
-- Top 10 resumido
-- Link pro site completo
+- **Data no topo** (ex: "🏠 TOP 3 LEILÕES - 30/01")
+- Top 3 resumido
+- Link pro site completo (página do dia)
 - Formato limpo, sem emojis excessivos
 
 ### GitHub Pages
-- Lista completa com todos os filtrados
+**Estrutura:**
+- `index.html` → Lista principal com todos os imóveis bons AINDA ATIVOS
+- `YYYY-MM-DD.html` → Snapshot do dia (histórico)
+
+**Conteúdo:**
 - Cards clicáveis
 - Top 3 destacados
 - Resumo com totais
+- Info sobre 1º/2º leilão no corpo (não no badge)
 
 ## Cron
 - **Horário:** 9h (seg-sex)
