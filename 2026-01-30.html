@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leilão Tracker - Curitiba</title>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+            color: #333;
+        }
+        h1 { color: #2c5530; border-bottom: 3px solid #2c5530; padding-bottom: 10px; }
+        h2 { color: #444; margin-top: 30px; }
+        .meta { color: #666; font-size: 14px; margin-bottom: 20px; }
+        .filters { background: #e8f5e9; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
+        .filters strong { color: #2c5530; }
+        a.property {
+            display: block;
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border-left: 4px solid #2c5530;
+            text-decoration: none;
+            color: inherit;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        a.property:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        a.property.top { border-left-color: #ffc107; background: #fffde7; }
+        a.property.top:hover { background: #fff8c4; }
+        .property h3 { margin: 0 0 10px 0; color: #2c5530; }
+        .property .avaliation { font-size: 14px; color: #666; margin-bottom: 5px; }
+        .property .leiloes { background: #f5f5f5; padding: 10px; border-radius: 4px; margin: 10px 0; }
+        .property .leilao-item { margin: 5px 0; }
+        .property .leilao-item.destaque { font-weight: bold; color: #d32f2f; }
+        .property .price { font-size: 20px; font-weight: bold; color: #d32f2f; }
+        .property .discount { background: #d32f2f; color: white; padding: 2px 8px; border-radius: 4px; font-weight: bold; font-size: 14px; }
+        .property .details { margin: 10px 0; color: #666; font-size: 14px; }
+        .property .details span { display: inline-block; margin-right: 15px; }
+        .property .status { margin: 10px 0; }
+        .property .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-right: 5px;
+        }
+        .badge.ocupado { background: #ffebee; color: #c62828; }
+        .badge.desocupado { background: #e8f5e9; color: #2e7d32; }
+        .badge.desconhecido { background: #f5f5f5; color: #666; }
+        .badge.leilao { background: #fff3e0; color: #e65100; }
+        .badge.compra-direta { background: #e3f2fd; color: #1565c0; }
+        .pick-reason {
+            background: #fff8e1;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+            font-style: italic;
+            color: #f57f17;
+            font-size: 14px;
+        }
+        .summary {
+            background: #2c5530;
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 30px 0;
+        }
+        .summary h2 { color: white; margin-top: 0; border: none; }
+        .summary p { color: white; margin: 8px 0; }
+        .summary strong { color: #a5d6a7; }
+        footer { text-align: center; margin-top: 30px; color: #999; font-size: 12px; }
+        .section-divider { border-top: 2px solid #ddd; margin: 40px 0; }
+        .warning { background: #fff3e0; border-left: 4px solid #ff9800; padding: 10px 15px; margin: 10px 0; font-size: 14px; }
+        .nav-dates { background: #fff; padding: 12px 15px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .nav-dates strong { color: #2c5530; margin-right: 10px; }
+        .nav-dates a { color: #2c5530; text-decoration: none; margin-right: 12px; padding: 4px 8px; border-radius: 4px; font-size: 14px; }
+        .nav-dates a:hover { background: #e8f5e9; }
+        .nav-dates a.active { background: #2c5530; color: white; }
+    </style>
+</head>
+<body>
+    <h1>🏠 Leilão Tracker - Curitiba</h1>
+    
+    <nav class="nav-dates">
+        <strong>📅 Histórico:</strong>
+        <a href="index.html">Atual</a>
+        <a href="2026-01-30.html" class="active">30/01</a>
+    </nav>
+    
+    <p class="meta">Atualizado: 30/01/2026 14:10 | Por: Avê</p>
+
+    <div class="filters">
+        <strong>Filtros aplicados:</strong> Desconto >40% | Preço <R$800k | Região: Curitiba + Grande Curitiba
+    </div>
+
+    <div class="summary">
+        <h2>📊 Resumo da Busca</h2>
+        <p><strong>Total varrido:</strong> 233 imóveis</p>
+        <p><strong>Filtrados (>40% off, <R$800k):</strong> 12 imóveis</p>
+        <p><strong>Fontes:</strong> leilaoimovel.com.br, portalzuk.com.br, topoleiloes.com.br</p>
+        <p><strong>Região:</strong> Curitiba + Grande Curitiba</p>
+    </div>
+
+    <h2>🏆 Top 3 Picks (Recomendados)</h2>
+
+    <a class="property top" href="https://www.portalzuk.com.br/imovel/pr/curitiba/portao/rua-marcelino-iachinski-30/34940-217512" target="_blank">
+        <h3>1. Casa - Portão</h3>
+        <div class="avaliation">Avaliação: R$ 1.215.733</div>
+        <div class="leiloes">
+            <div class="leilao-item">1º Leilão: 11/02/2026 — R$ 1.215.733</div>
+            <div class="leilao-item destaque">2º Leilão: 13/02/2026 — R$ 383.675 <span class="discount">68% OFF</span></div>
+        </div>
+        <div class="details">
+            <span>📍 R. Marcelino Iachinski, 30</span>
+            <span>📐 254m² construída | 361m² terreno</span>
+        </div>
+        <div class="status">
+            <span class="badge leilao">2º Leilão</span>
+            <span class="badge ocupado">⚠️ OCUPADO</span>
+        </div>
+        <div class="warning">Desocupação por conta do adquirente (art. 30 lei 9.514/97)</div>
+        <div class="pick-reason">⭐ Maior desconto da lista — 68% off em bairro nobre, mas ocupado (considerar custo de desocupação)</div>
+    </a>
+
+    <a class="property top" href="https://topoleiloes.com.br/lote/32437/apartamento-ed-filadelfia-rua-bento-viana-958-agua-verde-curitibapr" target="_blank">
+        <h3>2. Apartamento - Água Verde</h3>
+        <div class="avaliation">Avaliação: R$ 1.036.829</div>
+        <div class="leiloes">
+            <div class="leilao-item">1º Leilão: 05/02/2026 11:50h — R$ 1.036.829</div>
+            <div class="leilao-item destaque">2º Leilão: 10/02/2026 11:50h — R$ 518.414 <span class="discount">50% OFF</span></div>
+        </div>
+        <div class="details">
+            <span>📍 Ed. Filadélfia, R. Bento Viana, 958</span>
+        </div>
+        <div class="status">
+            <span class="badge leilao">2º Leilão</span>
+            <span class="badge desconhecido">Ocupação: Verificar edital</span>
+        </div>
+        <div class="pick-reason">⭐ Localização premium — Água Verde tem alta liquidez pra revenda</div>
+    </a>
+
+    <a class="property top" href="https://www.portalzuk.com.br/imovel/pr/curitiba/alto-boqueirao/rua-julio-zandona-888/35174-216690" target="_blank">
+        <h3>3. Sobrado - Alto Boqueirão</h3>
+        <div class="avaliation">Avaliação: R$ 683.600</div>
+        <div class="leiloes">
+            <div class="leilao-item">1º Leilão: 05/02/2026 — R$ 683.600</div>
+            <div class="leilao-item destaque">2º Leilão: 19/02/2026 — R$ 341.800 <span class="discount">50% OFF</span></div>
+        </div>
+        <div class="details">
+            <span>📍 R. Júlio Zandoná, 888</span>
+            <span>📐 122m² privativa</span>
+        </div>
+        <div class="status">
+            <span class="badge leilao">2º Leilão</span>
+            <span class="badge ocupado">⚠️ OCUPADO</span>
+        </div>
+        <div class="warning">Imóvel ocupado no momento</div>
+        <div class="pick-reason">⭐ Bom preço por m², mas ocupado — bairro em valorização</div>
+    </a>
+
+    <div class="section-divider"></div>
+
+    <h2>📋 Lista Completa</h2>
+
+    <a class="property" href="https://www.leilaoimovel.com.br/imovel/pr/curitiba/residencial-edificio-zurique-sem-direito-ao-uso-das-vagas-mencionadas-na-matricula-do-apartam-imovel-caixa-economica-federal-cef-2220646-10209029-venda-direta-caixa" target="_blank">
+        <h3>4. Apartamento - Jardim Social</h3>
+        <div class="avaliation">Avaliação: R$ 1.370.000</div>
+        <div class="leiloes">
+            <div class="leilao-item destaque">Compra Direta: R$ 742.152 <span class="discount">46% OFF</span></div>
+        </div>
+        <div class="details">
+            <span>📍 R. Cel. Temístocles de Souza Brasil, 208</span>
+        </div>
+        <div class="status">
+            <span class="badge compra-direta">Compra Direta</span>
+            <span class="badge desconhecido">Ocupação: Verificar</span>
+        </div>
+    </a>
+
+    <a class="property" href="https://www.leilaoimovel.com.br/imovel/pr/curitiba/residencial-villaggio-padova-3-quartos-1-vaga-na-garagem-area-de-servico-wc-sala-co-imovel-caixa-economica-federal-cef-2536720-8555527593780-venda-direta-caixa" target="_blank">
+        <h3>5. Apartamento - Santa Quitéria</h3>
+        <div class="avaliation">Avaliação: R$ 305.000</div>
+        <div class="leiloes">
+            <div class="leilao-item destaque">Venda Online: R$ 194.380 <span class="discount">36% OFF</span></div>
+            <div class="leilao-item">Encerra: 03/02/2026 18:00</div>
+        </div>
+        <div class="details">
+            <span>📍 R. Eng. Luiz Carlos de Oliveira, 160</span>
+            <span>📐 3 quartos, 1 vaga</span>
+        </div>
+        <div class="status">
+            <span class="badge compra-direta">Venda Online</span>
+            <span class="badge desconhecido">Ocupação: Verificar</span>
+        </div>
+    </a>
+
+    <a class="property" href="https://www.leilaoimovel.com.br/imovel/pr/curitiba/residencial-res-cidade-de-padova-2-quartos-1-vaga-na-garagem-wc-sala-cozinha-imovel-caixa-economica-federal-cef-2532349-8555525253788-venda-direta-caixa" target="_blank">
+        <h3>6. Apartamento - Campo de Santana</h3>
+        <div class="avaliation">Avaliação: R$ 210.000</div>
+        <div class="leiloes">
+            <div class="leilao-item destaque">Compra Direta: R$ 126.926 <span class="discount">40% OFF</span></div>
+        </div>
+        <div class="details">
+            <span>📍 R. Angelo Tozim, 1060</span>
+            <span>📐 2 quartos, 1 vaga</span>
+        </div>
+        <div class="status">
+            <span class="badge compra-direta">Compra Direta</span>
+            <span class="badge desconhecido">Ocupação: Verificar</span>
+        </div>
+    </a>
+
+    <a class="property" href="https://www.leilaoimovel.com.br/imovel/pr/curitiba/residencial-cond-res-victoria-152-2-quartos-imovel-caixa-economica-federal-cef-2532346-8444429850655-venda-direta-caixa" target="_blank">
+        <h3>7. Casa - Campo de Santana</h3>
+        <div class="avaliation">Avaliação: R$ 251.512</div>
+        <div class="leiloes">
+            <div class="leilao-item destaque">Compra Direta: R$ 154.002 <span class="discount">39% OFF</span></div>
+        </div>
+        <div class="details">
+            <span>📍 R. Victoria Visinoni Campos, 152</span>
+            <span>📐 2 quartos</span>
+        </div>
+        <div class="status">
+            <span class="badge compra-direta">Compra Direta</span>
+            <span class="badge desconhecido">Ocupação: Verificar</span>
+        </div>
+    </a>
+
+    <a class="property" href="https://www.leilaoimovel.com.br/imovel/pr/curitiba/residencial-condominio-genesis-vii-imovel-caixa-economica-federal-cef-2512037-8444414754035-venda-direta-caixa" target="_blank">
+        <h3>8. Casa - Campo de Santana</h3>
+        <div class="avaliation">Avaliação: R$ 250.000</div>
+        <div class="leiloes">
+            <div class="leilao-item destaque">Compra Direta: R$ 153.076 <span class="discount">39% OFF</span></div>
+        </div>
+        <div class="details">
+            <span>📍 R. Ewerton Leinig Saporski, 347</span>
+        </div>
+        <div class="status">
+            <span class="badge compra-direta">Compra Direta</span>
+            <span class="badge desconhecido">Ocupação: Verificar</span>
+        </div>
+    </a>
+
+    <a class="property" href="https://www.leilaoimovel.com.br/imovel/pr/curitiba/residencial-cond-res-faustina-430-2-quartos-wc-sala-cozinha-imovel-caixa-economica-federal-cef-2336791-8444423699165-venda-direta-caixa" target="_blank">
+        <h3>9. Casa - Tatuquara</h3>
+        <div class="avaliation">Avaliação: R$ 240.000</div>
+        <div class="leiloes">
+            <div class="leilao-item destaque">Compra Direta: R$ 146.953 <span class="discount">39% OFF</span></div>
+        </div>
+        <div class="details">
+            <span>📍 R. Irmã Faustina Kowalska, 430</span>
+            <span>📐 2 quartos</span>
+        </div>
+        <div class="status">
+            <span class="badge compra-direta">Compra Direta</span>
+            <span class="badge desconhecido">Ocupação: Verificar</span>
+        </div>
+    </a>
+
+    <a class="property" href="https://www.leilaoimovel.com.br/imovel/pr/curitiba/residencial-cond-res-markzuk-imovel-caixa-economica-federal-cef-2108061-1444418518931-venda-direta-caixa" target="_blank">
+        <h3>10. Casa - Campo de Santana</h3>
+        <div class="avaliation">Avaliação: R$ 200.000</div>
+        <div class="leiloes">
+            <div class="leilao-item destaque">Compra Direta: R$ 120.541 <span class="discount">40% OFF</span></div>
+        </div>
+        <div class="details">
+            <span>📍 R. Jurko Markzuk, 42</span>
+            <span>📐 39m² útil | 80m² terreno</span>
+        </div>
+        <div class="status">
+            <span class="badge compra-direta">Compra Direta</span>
+            <span class="badge desconhecido">Ocupação: Verificar</span>
+        </div>
+    </a>
+
+    <a class="property" href="https://www.leilaoimovel.com.br/imovel/pr/curitiba/residencial-cj-moradias-augustas-xix-imovel-caixa-economica-federal-cef-2216172-1444407047827-venda-direta-caixa" target="_blank">
+        <h3>11. Apartamento - CIC</h3>
+        <div class="avaliation">Avaliação: R$ 180.000</div>
+        <div class="leiloes">
+            <div class="leilao-item destaque">Compra Direta: R$ 111.168 <span class="discount">38% OFF</span></div>
+        </div>
+        <div class="details">
+            <span>📍 R. Erval Velho, 342</span>
+        </div>
+        <div class="status">
+            <span class="badge compra-direta">Compra Direta</span>
+            <span class="badge desconhecido">Ocupação: Verificar</span>
+        </div>
+    </a>
+
+    <a class="property" href="https://www.leilaoimovel.com.br/imovel/pr/curitiba/residencial-conj-village-res-2-quartos-imovel-caixa-economica-federal-cef-2220649-8444412097398-venda-direta-caixa" target="_blank">
+        <h3>12. Sobrado - Boqueirão</h3>
+        <div class="avaliation">Avaliação: R$ 280.000</div>
+        <div class="leiloes">
+            <div class="leilao-item destaque">Venda Online: R$ 178.448 <span class="discount">36% OFF</span></div>
+            <div class="leilao-item">Encerra: 30/01/2026 18:00 (HOJE!)</div>
+        </div>
+        <div class="details">
+            <span>📍 R. Dr. Danilo Gomes, 2521</span>
+            <span>📐 2 quartos</span>
+        </div>
+        <div class="status">
+            <span class="badge compra-direta">Venda Online</span>
+            <span class="badge desconhecido">Ocupação: Verificar</span>
+        </div>
+    </a>
+
+    <footer>
+        <p>🐦 Avê — Leilão Tracker v1.1</p>
+        <p>Atualizado diariamente seg-sex 9h | Critérios: >40% desconto | <R$800k | Curitiba e região</p>
+        <p style="font-size: 11px; margin-top: 15px;">⚠️ Sempre verificar ocupação e detalhes no edital oficial antes de dar lance</p>
+    </footer>
+</body>
+</html>
