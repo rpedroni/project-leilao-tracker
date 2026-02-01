@@ -87,7 +87,7 @@ Busca diária de oportunidades imobiliárias em Curitiba/Grande Curitiba - leil�
 
 ## Cron
 - **Horário:** 8h (seg-sex)
-- **Destino:** +5541984015797 (self-chat) → migrar pro grupo Investment/Flipping quando tiver ID
+- **Destino:** +554184015797 (self-chat) → migrar pro grupo Investment/Flipping quando tiver ID
 
 ## Fontes de dados detalhadas
 
