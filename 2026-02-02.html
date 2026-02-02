@@ -399,6 +399,18 @@
     </footer>
   </div>
 <script>
+  const metaTranslations = {
+    'Encerra': 'Closes',
+    'Venda Online Caixa': 'Caixa Online Sale',
+    'Compra Direta': 'Direct Purchase',
+    'Bairro Prioritário': 'Priority Area',
+    'Judicial': 'Court Auction',
+    'Leilão Imóvel': 'Leilão Imóvel',
+    'Portal Zuk': 'Portal Zuk',
+    'Mega Leilões': 'Mega Leilões',
+    'Lance Mínimo': 'Minimum Bid'
+  };
+  
   const translations = {
     pt: {
       subtitle: 'Oportunidades imobiliárias em Curitiba e região • Atualizado 02/02/2026',
@@ -409,9 +421,9 @@
         'Lance (2ª Praça)': 'Bid (2nd Round)',
         'Lance Inicial': 'Starting Bid',
         'Compra Direta': 'Direct Purchase',
+        'Lance Mínimo': 'Minimum Bid',
         'Avaliação': 'Appraisal',
-        'Valor': 'Value',
-        'Ver Detalhes →': 'View Details →'
+        'Valor': 'Value'
       },
       footer: ['🐦 Avê • Leilão Tracker • Atualizado automaticamente', 'Fontes: Leilão Imóvel, Portal Zuk, Mega Leilões']
     },
@@ -424,9 +436,9 @@
         'Lance (2ª Praça)': 'Bid (2nd Round)',
         'Lance Inicial': 'Starting Bid',
         'Compra Direta': 'Direct Purchase',
+        'Lance Mínimo': 'Minimum Bid',
         'Avaliação': 'Appraisal',
-        'Valor': 'Value',
-        'Ver Detalhes →': 'View Details →'
+        'Valor': 'Value'
       },
       footer: ['🐦 Avê • Leilão Tracker • Auto-updated', 'Sources: Leilão Imóvel, Portal Zuk, Mega Leilões']
     }
@@ -447,11 +459,33 @@
     document.querySelectorAll('.price-label').forEach(el => {
       const orig = el.dataset.orig || el.textContent;
       el.dataset.orig = orig;
-      el.textContent = currentLang === 'en' && translations.en.labels[orig] ? translations.en.labels[orig] : orig;
+      el.textContent = currentLang === 'en' && t.labels[orig] ? t.labels[orig] : orig;
     });
     
     document.querySelectorAll('.card-link').forEach(el => {
       el.textContent = currentLang === 'en' ? 'View Details →' : 'Ver Detalhes →';
+    });
+    
+    // Translate meta tags
+    document.querySelectorAll('.meta-tag').forEach(el => {
+      const orig = el.dataset.orig || el.textContent;
+      el.dataset.orig = orig;
+      if (currentLang === 'en') {
+        let text = orig;
+        // Handle "Encerra XX/XX" pattern
+        if (text.includes('Encerra')) {
+          text = text.replace('Encerra', 'Closes');
+        }
+        // Handle other meta translations
+        for (const [pt, en] of Object.entries(metaTranslations)) {
+          if (text.includes(pt) && pt !== 'Encerra') {
+            text = text.replace(pt, en);
+          }
+        }
+        el.textContent = text;
+      } else {
+        el.textContent = orig;
+      }
     });
     
     const footerPs = document.querySelectorAll('footer p');
