@@ -6,39 +6,136 @@
   <title>Leilão Tracker - 06/02/2026</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0d1117; color: #c9d1d9; line-height: 1.6; }
+    body { 
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
+      background: #0d1117; 
+      color: #c9d1d9; 
+      line-height: 1.6; 
+    }
     .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
-    header { text-align: center; padding: 30px 0; border-bottom: 1px solid #30363d; margin-bottom: 30px; }
+    header { 
+      text-align: center; 
+      padding: 30px 0; 
+      border-bottom: 1px solid #30363d; 
+      margin-bottom: 30px; 
+    }
     header h1 { color: #58a6ff; font-size: 2em; margin-bottom: 10px; }
     header p { color: #8b949e; }
-    nav { display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; margin-top: 15px; }
-    nav a { color: #58a6ff; text-decoration: none; padding: 5px 10px; border-radius: 6px; background: #21262d; }
+    nav { 
+      display: flex; 
+      gap: 15px; 
+      justify-content: center; 
+      flex-wrap: wrap; 
+      margin-top: 15px; 
+    }
+    nav a { 
+      color: #58a6ff; 
+      text-decoration: none; 
+      padding: 5px 10px; 
+      border-radius: 6px; 
+      background: #21262d; 
+    }
     nav a:hover, nav a.active { background: #388bfd; color: #fff; }
-    .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 30px; }
-    .stat { background: #161b22; padding: 20px; border-radius: 8px; text-align: center; border: 1px solid #30363d; }
+    .stats { 
+      display: grid; 
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); 
+      gap: 15px; 
+      margin-bottom: 30px; 
+    }
+    .stat { 
+      background: #161b22; 
+      padding: 20px; 
+      border-radius: 8px; 
+      text-align: center; 
+      border: 1px solid #30363d; 
+    }
     .stat-value { font-size: 2em; font-weight: bold; color: #58a6ff; }
     .stat-label { color: #8b949e; font-size: 0.9em; }
-    .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 20px; }
-    .card { background: #161b22; border-radius: 12px; padding: 20px; border: 1px solid #30363d; transition: transform 0.2s, border-color 0.2s; }
+    .cards { 
+      display: grid; 
+      grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); 
+      gap: 20px; 
+    }
+    .card { 
+      background: #161b22; 
+      border-radius: 12px; 
+      padding: 20px; 
+      border: 1px solid #30363d; 
+      transition: transform 0.2s, border-color 0.2s;
+      position: relative;
+    }
     .card:hover { transform: translateY(-2px); border-color: #58a6ff; }
     .card.priority { border-left: 4px solid #f0883e; }
     .card.top { border-left: 4px solid #238636; }
-    .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px; }
+    .card.new::before {
+      content: '✨ NOVO';
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: #238636;
+      color: #fff;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 0.7em;
+      font-weight: bold;
+    }
+    .card-header { 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: flex-start; 
+      margin-bottom: 15px; 
+    }
     .card-title { font-size: 1.1em; color: #f0f6fc; }
-    .card-discount { background: #238636; color: #fff; padding: 5px 12px; border-radius: 20px; font-weight: bold; font-size: 0.9em; }
+    .card-discount { 
+      background: #238636; 
+      color: #fff; 
+      padding: 5px 12px; 
+      border-radius: 20px; 
+      font-weight: bold; 
+      font-size: 0.9em; 
+    }
     .card-discount.hot { background: #da3633; }
     .card-location { color: #8b949e; font-size: 0.9em; margin-bottom: 10px; }
     .card-prices { display: flex; gap: 20px; margin: 15px 0; }
     .price-item { }
     .price-label { color: #8b949e; font-size: 0.8em; }
     .price-value { font-size: 1.2em; font-weight: bold; color: #7ee787; }
-    .price-value.original { color: #f85149; text-decoration: line-through; font-size: 1em; }
+    .price-value.original { 
+      color: #f85149; 
+      text-decoration: line-through; 
+      font-size: 1em; 
+    }
     .card-meta { display: flex; flex-wrap: wrap; gap: 10px; margin: 15px 0; }
-    .meta-tag { background: #21262d; padding: 4px 10px; border-radius: 4px; font-size: 0.85em; color: #8b949e; }
-    .card-link { display: block; text-align: center; background: #21262d; color: #58a6ff; padding: 12px; border-radius: 8px; text-decoration: none; font-weight: 500; transition: background 0.2s; }
+    .meta-tag { 
+      background: #21262d; 
+      padding: 4px 10px; 
+      border-radius: 4px; 
+      font-size: 0.85em; 
+      color: #8b949e; 
+    }
+    .card-link { 
+      display: block; 
+      text-align: center; 
+      background: #21262d; 
+      color: #58a6ff; 
+      padding: 12px; 
+      border-radius: 8px; 
+      text-decoration: none; 
+      font-weight: 500; 
+      transition: background 0.2s; 
+    }
     .card-link:hover { background: #30363d; }
-    footer { text-align: center; padding: 30px 0; margin-top: 30px; border-top: 1px solid #30363d; color: #8b949e; }
-    @media (max-width: 600px) { .cards { grid-template-columns: 1fr; } .card-prices { flex-direction: column; gap: 10px; } }
+    footer { 
+      text-align: center; 
+      padding: 30px 0; 
+      margin-top: 30px; 
+      border-top: 1px solid #30363d; 
+      color: #8b949e; 
+    }
+    @media (max-width: 600px) { 
+      .cards { grid-template-columns: 1fr; } 
+      .card-prices { flex-direction: column; gap: 10px; } 
+    }
   </style>
 </head>
 <body>
@@ -47,8 +144,9 @@
       <h1>🏠 Leilão Tracker</h1>
       <p>Oportunidades imobiliárias em Curitiba e região • 06/02/2026</p>
       <nav>
-        <a href="index.html">Atual</a>
-        <a href="2026-02-06.html" class="active">06/02</a>
+        <a href="index.html" class="">Atual</a>
+        <a href="2026-02-06.html">06/02</a>
+        <a href="2026-02-05.html">05/02</a>
         <a href="2026-02-04.html">04/02</a>
         <a href="2026-02-03.html">03/02</a>
         <a href="2026-02-02.html">02/02</a>
@@ -59,11 +157,11 @@
 
     <div class="stats">
       <div class="stat">
-        <div class="stat-value">4</div>
+        <div class="stat-value">96</div>
         <div class="stat-label">Acima de 40%</div>
       </div>
       <div class="stat">
-        <div class="stat-value">4</div>
+        <div class="stat-value">100</div>
         <div class="stat-label">Total Encontrados</div>
       </div>
       <div class="stat">
@@ -73,107 +171,490 @@
     </div>
 
     <div class="cards">
-      <!-- TOP 1: Casa Portão - 68% -->
-      <div class="card top">
+      <div class="card top priority">
         <div class="card-header">
           <div class="card-title">🏠 Casa - Portão</div>
           <div class="card-discount hot">-68%</div>
         </div>
-        <div class="card-location">📍 R. Marcelino Iachinski, 30 - Portão, Curitiba/PR</div>
+        <div class="card-location">📍 Rua Marcelino Iachinski,  30</div>
         <div class="card-prices">
           <div class="price-item">
-            <div class="price-label">Lance Mínimo</div>
-            <div class="price-value">R$ 383.675</div>
+            <div class="price-label">Leilão 2ª Praça</div>
+            <div class="price-value">R$ 383.675</div>
           </div>
           <div class="price-item">
             <div class="price-label">Avaliação</div>
-            <div class="price-value original">R$ 1.215.733</div>
+            <div class="price-value original">R$ 1.215.733</div>
           </div>
         </div>
         <div class="card-meta">
-          <span class="meta-tag">361m²</span>
-          <span class="meta-tag">Leilão 2ª Praça</span>
-          <span class="meta-tag">Encerramento: 13/02/2026</span>
+          <span class="meta-tag">254,62m² (terreno: 361,46m²)</span>
+          <span class="meta-tag">Encerramento: 12/02/2026</span>
+          <span class="meta-tag">⚠️ Ocupado</span>
+          
         </div>
         <a href="https://www.portalzuk.com.br/imovel/pr/curitiba/portao/rua-marcelino-iachinski-30/34940-217512" target="_blank" class="card-link">Ver no Portal Zuk →</a>
       </div>
-
-      <!-- TOP 2: Casa Fazenda Rio Grande - 54% -->
-      <div class="card top">
+      <div class="card top priority">
         <div class="card-header">
-          <div class="card-title">🏠 Casa - Fazenda Rio Grande</div>
-          <div class="card-discount">-54%</div>
+          <div class="card-title">🏪 Sala Comercial - Centro (São José dos Pinhais)</div>
+          <div class="card-discount ">-50%</div>
         </div>
-        <div class="card-location">📍 Av. Rio Amazonas, 3845 - Estados, Fazenda Rio Grande/PR</div>
+        <div class="card-location">📍 Rua Quinze de Novembro,  2175</div>
         <div class="card-prices">
           <div class="price-item">
-            <div class="price-label">Lance Inicial</div>
-            <div class="price-value">R$ 114.328</div>
+            <div class="price-label">Leilão 2ª Praça</div>
+            <div class="price-value">R$ 115.000</div>
           </div>
           <div class="price-item">
             <div class="price-label">Avaliação</div>
-            <div class="price-value original">R$ 248.539</div>
+            <div class="price-value original">R$ 230.000</div>
           </div>
         </div>
         <div class="card-meta">
-          <span class="meta-tag">84m²</span>
-          <span class="meta-tag">Leilão Itaú</span>
-          <span class="meta-tag">Encerramento: 10/02/2026</span>
+          <span class="meta-tag">35,00m² útil</span>
+          <span class="meta-tag">Encerramento: 18/02/2026</span>
+          <span class="meta-tag">⚠️ Ocupado</span>
+          
         </div>
-        <a href="https://www.portalzuk.com.br/imovel/pr/fazenda-rio-grande/estados/avenida-rio-amazonas-3845/35311-217818" target="_blank" class="card-link">Ver no Portal Zuk →</a>
+        <a href="https://www.portalzuk.com.br/imovel/pr/sao-jose-dos-pinhais/centro/rua-quinze-de-novembro-2175/34937-215324" target="_blank" class="card-link">Ver no Portal Zuk →</a>
       </div>
-
-      <!-- TOP 3: Sobrado Alto Boqueirão - 50% -->
+      <div class="card top priority">
+        <div class="card-header">
+          <div class="card-title">🏢 Apartamento - Jardim Social</div>
+          <div class="card-discount ">-45.83%</div>
+        </div>
+        <div class="card-location">📍 RUA CORONEL TEMISTOCLES DE SOUZA BRASIL, N. 208, Apto A42, BL A</div>
+        <div class="card-prices">
+          <div class="price-item">
+            <div class="price-label">Venda Direta Online</div>
+            <div class="price-value">R$ 742.153</div>
+          </div>
+          <div class="price-item">
+            <div class="price-label">Avaliação</div>
+            <div class="price-value original">R$ 1.370.000</div>
+          </div>
+        </div>
+        <div class="card-meta">
+          
+          
+          
+          
+        </div>
+        <a href="https://venda-imoveis.caixa.gov.br/sistema/detalhe-imovel.asp?hdnimovel=10209029" target="_blank" class="card-link">Ver no Caixa Econômica →</a>
+      </div>
       <div class="card top">
         <div class="card-header">
           <div class="card-title">🏠 Sobrado - Alto Boqueirão</div>
-          <div class="card-discount">-50%</div>
+          <div class="card-discount ">-50%</div>
         </div>
-        <div class="card-location">📍 R. Júlio Zandoná, 888 - Alto Boqueirão, Curitiba/PR</div>
+        <div class="card-location">📍 Rua Júlio Zandoná,  888</div>
         <div class="card-prices">
           <div class="price-item">
-            <div class="price-label">Lance Mínimo</div>
-            <div class="price-value">R$ 341.800</div>
-          </div>
-          <div class="price-item">
-            <div class="price-label">1º Leilão</div>
-            <div class="price-value original">R$ 683.600</div>
-          </div>
-        </div>
-        <div class="card-meta">
-          <span class="meta-tag">Leilão 2ª Praça Itaú</span>
-          <span class="meta-tag">Encerramento: 19/02/2026</span>
-        </div>
-        <a href="https://www.portalzuk.com.br/imovel/pr/curitiba/alto-boqueirao/rua-julio-zandona-888/35174-216690" target="_blank" class="card-link">Ver no Portal Zuk →</a>
-      </div>
-
-      <!-- Apartamento Jardim Social - 46% -->
-      <div class="card priority">
-        <div class="card-header">
-          <div class="card-title">🏢 Apartamento - Jardim Social</div>
-          <div class="card-discount">-46%</div>
-        </div>
-        <div class="card-location">📍 R. Cel. Temístocles, 208 - Jardim Social, Curitiba/PR</div>
-        <div class="card-prices">
-          <div class="price-item">
-            <div class="price-label">Lance Mínimo</div>
-            <div class="price-value">R$ 742.152</div>
+            <div class="price-label">Leilão 2ª Praça</div>
+            <div class="price-value">R$ 341.800</div>
           </div>
           <div class="price-item">
             <div class="price-label">Avaliação</div>
-            <div class="price-value original">R$ 1.370.000</div>
+            <div class="price-value original">R$ 683.600</div>
           </div>
         </div>
         <div class="card-meta">
-          <span class="meta-tag">Compra Direta</span>
+          
+          <span class="meta-tag">Encerramento: 18/02/2026</span>
           <span class="meta-tag">⚠️ Ocupado</span>
+          
         </div>
-        <a href="https://www.leilaoimovel.com.br/imovel/pr/curitiba/residencial-edificio-zurique-sem-direito-ao-uso-das-vagas-mencionadas-na-matricula-do-apartam-imovel-caixa-economica-federal-cef-2220646-10209029-venda-direta-caixa" target="_blank" class="card-link">Ver no Leilão Imóvel →</a>
+        <a href="https://www.portalzuk.com.br/imovel/pr/curitiba/alto-boqueirao/rua-julio-zandona-888/35174-216690" target="_blank" class="card-link">Ver no Portal Zuk →</a>
+      </div>
+      <div class="card top">
+        <div class="card-header">
+          <div class="card-title">🏠 Casa - Das Gracas (Colombo)</div>
+          <div class="card-discount ">-47.75%</div>
+        </div>
+        <div class="card-location">📍 RUA DO CAJUEIRO, N. 33, CS 02 LT 20 QD 36</div>
+        <div class="card-prices">
+          <div class="price-item">
+            <div class="price-label">Venda Online</div>
+            <div class="price-value">R$ 113.919</div>
+          </div>
+          <div class="price-item">
+            <div class="price-label">Avaliação</div>
+            <div class="price-value original">R$ 218.000</div>
+          </div>
+        </div>
+        <div class="card-meta">
+          
+          
+          
+          
+        </div>
+        <a href="https://venda-imoveis.caixa.gov.br/sistema/detalhe-imovel.asp?hdnimovel=8444403839212" target="_blank" class="card-link">Ver no Caixa Econômica →</a>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">🏢 Apartamento - Bom Jesus (Campo Largo)</div>
+          <div class="card-discount ">-46.57%</div>
+        </div>
+        <div class="card-location">📍 RUA DOS EXPEDICIONARIOS, N. 1145, Apto 3325, BL 33</div>
+        <div class="card-prices">
+          <div class="price-item">
+            <div class="price-label">Venda Direta Online</div>
+            <div class="price-value">R$ 112.218</div>
+          </div>
+          <div class="price-item">
+            <div class="price-label">Avaliação</div>
+            <div class="price-value original">R$ 210.000</div>
+          </div>
+        </div>
+        <div class="card-meta">
+          
+          
+          
+          
+        </div>
+        <a href="https://venda-imoveis.caixa.gov.br/sistema/detalhe-imovel.asp?hdnimovel=8787705456220" target="_blank" class="card-link">Ver no Caixa Econômica →</a>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">🏢 Apartamento - Bom Jesus (Campo Largo)</div>
+          <div class="card-discount ">-46.57%</div>
+        </div>
+        <div class="card-location">📍 RODOVIA DOS EXPEDICIONARIOS, N. 1145, Apto 916, TIPO03 BL09 VG320</div>
+        <div class="card-prices">
+          <div class="price-item">
+            <div class="price-label">Venda Direta Online</div>
+            <div class="price-value">R$ 109.546</div>
+          </div>
+          <div class="price-item">
+            <div class="price-label">Avaliação</div>
+            <div class="price-value original">R$ 205.000</div>
+          </div>
+        </div>
+        <div class="card-meta">
+          
+          
+          
+          
+        </div>
+        <a href="https://venda-imoveis.caixa.gov.br/sistema/detalhe-imovel.asp?hdnimovel=8787710403120" target="_blank" class="card-link">Ver no Caixa Econômica →</a>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">🏢 Apartamento - Jardim Itaqui (Campo Largo)</div>
+          <div class="card-discount ">-46.09%</div>
+        </div>
+        <div class="card-location">📍 RUA MARIA JOAQUINA VAZ, N. 721, Apto 305, BL 26 VAGA 1111</div>
+        <div class="card-prices">
+          <div class="price-item">
+            <div class="price-label">Licita��o Aberta</div>
+            <div class="price-value">R$ 98.667</div>
+          </div>
+          <div class="price-item">
+            <div class="price-label">Avaliação</div>
+            <div class="price-value original">R$ 183.000</div>
+          </div>
+        </div>
+        <div class="card-meta">
+          
+          
+          
+          
+        </div>
+        <a href="https://venda-imoveis.caixa.gov.br/sistema/detalhe-imovel.asp?hdnimovel=8787704581454" target="_blank" class="card-link">Ver no Caixa Econômica →</a>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">🏠 Casa - Estados (Fazenda Rio Grande)</div>
+          <div class="card-discount ">-44.91%</div>
+        </div>
+        <div class="card-location">📍 RUA PIEN (ESQ AVENIDA MATO GROSSO), N. 329, CS 79 AREA 29B-3</div>
+        <div class="card-prices">
+          <div class="price-item">
+            <div class="price-label">Licita��o Aberta</div>
+            <div class="price-value">R$ 121.216</div>
+          </div>
+          <div class="price-item">
+            <div class="price-label">Avaliação</div>
+            <div class="price-value original">R$ 220.000</div>
+          </div>
+        </div>
+        <div class="card-meta">
+          
+          
+          
+          
+        </div>
+        <a href="https://venda-imoveis.caixa.gov.br/sistema/detalhe-imovel.asp?hdnimovel=8787704262642" target="_blank" class="card-link">Ver no Caixa Econômica →</a>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">🏠 Casa - Estados (Fazenda Rio Grande)</div>
+          <div class="card-discount ">-42.91%</div>
+        </div>
+        <div class="card-location">📍 RUA RIO DE JANEIRO, N. 447, CS 81</div>
+        <div class="card-prices">
+          <div class="price-item">
+            <div class="price-label">Venda Direta Online</div>
+            <div class="price-value">R$ 151.302</div>
+          </div>
+          <div class="price-item">
+            <div class="price-label">Avaliação</div>
+            <div class="price-value original">R$ 265.000</div>
+          </div>
+        </div>
+        <div class="card-meta">
+          
+          
+          
+          
+        </div>
+        <a href="https://venda-imoveis.caixa.gov.br/sistema/detalhe-imovel.asp?hdnimovel=8555531555707" target="_blank" class="card-link">Ver no Caixa Econômica →</a>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">🏢 Apartamento - Jardim Itaqui (Campo Largo)</div>
+          <div class="card-discount ">-42.23%</div>
+        </div>
+        <div class="card-location">📍 RUA MARIA JOAQUINA VAZ, N. 721, Apto 301, PAV 03 BL 05 GARAGEM 151</div>
+        <div class="card-prices">
+          <div class="price-item">
+            <div class="price-label">Venda Direta Online</div>
+            <div class="price-value">R$ 99.956</div>
+          </div>
+          <div class="price-item">
+            <div class="price-label">Avaliação</div>
+            <div class="price-value original">R$ 173.000</div>
+          </div>
+        </div>
+        <div class="card-meta">
+          
+          
+          
+          
+        </div>
+        <a href="https://venda-imoveis.caixa.gov.br/sistema/detalhe-imovel.asp?hdnimovel=8787703926466" target="_blank" class="card-link">Ver no Caixa Econômica →</a>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">🏢 Apartamento - Jardim Itaqui (Campo Largo)</div>
+          <div class="card-discount ">-42.23%</div>
+        </div>
+        <div class="card-location">📍 RUA MARIA JOAQUINA VAZ, N. 721, Apto 308, PAV 03 BL 26 GARAGEM 1108</div>
+        <div class="card-prices">
+          <div class="price-item">
+            <div class="price-label">Venda Direta Online</div>
+            <div class="price-value">R$ 98.223</div>
+          </div>
+          <div class="price-item">
+            <div class="price-label">Avaliação</div>
+            <div class="price-value original">R$ 170.000</div>
+          </div>
+        </div>
+        <div class="card-meta">
+          
+          
+          
+          
+        </div>
+        <a href="https://venda-imoveis.caixa.gov.br/sistema/detalhe-imovel.asp?hdnimovel=8787711041508" target="_blank" class="card-link">Ver no Caixa Econômica →</a>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">🗺️ Terreno - Jardim Roma (Almirante Tamandare)</div>
+          <div class="card-discount ">-42%</div>
+        </div>
+        <div class="card-location">📍 R ARAUCARIA, N. 506, LT 11 QD 16</div>
+        <div class="card-prices">
+          <div class="price-item">
+            <div class="price-label">Venda Direta Online</div>
+            <div class="price-value">R$ 178.081</div>
+          </div>
+          <div class="price-item">
+            <div class="price-label">Avaliação</div>
+            <div class="price-value original">R$ 307.000</div>
+          </div>
+        </div>
+        <div class="card-meta">
+          
+          
+          
+          
+        </div>
+        <a href="https://venda-imoveis.caixa.gov.br/sistema/detalhe-imovel.asp?hdnimovel=1444419118090" target="_blank" class="card-link">Ver no Caixa Econômica →</a>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">🏠 Casa - Jardim Esmeralda (Campo Largo)</div>
+          <div class="card-discount ">-41.62%</div>
+        </div>
+        <div class="card-location">📍 RUA PROJETADA 01, N. SN, CS 40 LT 01</div>
+        <div class="card-prices">
+          <div class="price-item">
+            <div class="price-label">Venda Online</div>
+            <div class="price-value">R$ 171.662</div>
+          </div>
+          <div class="price-item">
+            <div class="price-label">Avaliação</div>
+            <div class="price-value original">R$ 294.000</div>
+          </div>
+        </div>
+        <div class="card-meta">
+          
+          
+          
+          
+        </div>
+        <a href="https://venda-imoveis.caixa.gov.br/sistema/detalhe-imovel.asp?hdnimovel=8444414478623" target="_blank" class="card-link">Ver no Caixa Econômica →</a>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">🏢 Apartamento - Estancia Pinhais (Pinhais)</div>
+          <div class="card-discount ">-41.62%</div>
+        </div>
+        <div class="card-location">📍 RUA TREZE DE MAIO, N. 913, Apto 04, PAV 03 VG 04</div>
+        <div class="card-prices">
+          <div class="price-item">
+            <div class="price-label">Licita��o Aberta</div>
+            <div class="price-value">R$ 166.407</div>
+          </div>
+          <div class="price-item">
+            <div class="price-label">Avaliação</div>
+            <div class="price-value original">R$ 285.000</div>
+          </div>
+        </div>
+        <div class="card-meta">
+          
+          
+          
+          
+        </div>
+        <a href="https://venda-imoveis.caixa.gov.br/sistema/detalhe-imovel.asp?hdnimovel=1444413047957" target="_blank" class="card-link">Ver no Caixa Econômica →</a>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">🏠 Casa - Campina Da Barra (Araucaria)</div>
+          <div class="card-discount ">-41.45%</div>
+        </div>
+        <div class="card-location">📍 RUA MARGARIDA, N. 970, CS 02 QD A</div>
+        <div class="card-prices">
+          <div class="price-item">
+            <div class="price-label">Venda Online</div>
+            <div class="price-value">R$ 138.199</div>
+          </div>
+          <div class="price-item">
+            <div class="price-label">Avaliação</div>
+            <div class="price-value original">R$ 236.000</div>
+          </div>
+        </div>
+        <div class="card-meta">
+          
+          
+          
+          
+        </div>
+        <a href="https://venda-imoveis.caixa.gov.br/sistema/detalhe-imovel.asp?hdnimovel=8444418914215" target="_blank" class="card-link">Ver no Caixa Econômica →</a>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">🏢 Apartamento - Santa Candida</div>
+          <div class="card-discount ">-41.45%</div>
+        </div>
+        <div class="card-location">📍 RUA PADRE PAULO CANELLES, N. 349, Apto 904, BL 09</div>
+        <div class="card-prices">
+          <div class="price-item">
+            <div class="price-label">Licita��o Aberta</div>
+            <div class="price-value">R$ 140.541</div>
+          </div>
+          <div class="price-item">
+            <div class="price-label">Avaliação</div>
+            <div class="price-value original">R$ 240.000</div>
+          </div>
+        </div>
+        <div class="card-meta">
+          
+          
+          
+          
+        </div>
+        <a href="https://venda-imoveis.caixa.gov.br/sistema/detalhe-imovel.asp?hdnimovel=8444423420543" target="_blank" class="card-link">Ver no Caixa Econômica →</a>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">🏠 Casa - Veneza (Fazenda Rio Grande)</div>
+          <div class="card-discount ">-41.45%</div>
+        </div>
+        <div class="card-location">📍 RUA NOEL ROSA, N. 280, CS 03</div>
+        <div class="card-prices">
+          <div class="price-item">
+            <div class="price-label">Venda Online</div>
+            <div class="price-value">R$ 161.623</div>
+          </div>
+          <div class="price-item">
+            <div class="price-label">Avaliação</div>
+            <div class="price-value original">R$ 276.000</div>
+          </div>
+        </div>
+        <div class="card-meta">
+          
+          
+          
+          
+        </div>
+        <a href="https://venda-imoveis.caixa.gov.br/sistema/detalhe-imovel.asp?hdnimovel=8444407371401" target="_blank" class="card-link">Ver no Caixa Econômica →</a>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">🏢 Apartamento - Bairro Bonfim (Almirante Tamandare)</div>
+          <div class="card-discount ">-41.07%</div>
+        </div>
+        <div class="card-location">📍 RUA ALFREDO DE ANDRADE, N. 75, Apto 305, BL 12</div>
+        <div class="card-prices">
+          <div class="price-item">
+            <div class="price-label">Venda Direta Online</div>
+            <div class="price-value">R$ 109.610</div>
+          </div>
+          <div class="price-item">
+            <div class="price-label">Avaliação</div>
+            <div class="price-value original">R$ 186.000</div>
+          </div>
+        </div>
+        <div class="card-meta">
+          
+          
+          
+          
+        </div>
+        <a href="https://venda-imoveis.caixa.gov.br/sistema/detalhe-imovel.asp?hdnimovel=8787708644361" target="_blank" class="card-link">Ver no Caixa Econômica →</a>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">🏢 Apartamento - Cond Colina Do Sol (Almirante Tamandare)</div>
+          <div class="card-discount ">-41.07%</div>
+        </div>
+        <div class="card-location">📍 RUA MANOEL BARBOSA, N. 207, Apto 9911, BL 99, VG 385</div>
+        <div class="card-prices">
+          <div class="price-item">
+            <div class="price-label">Venda Direta Online</div>
+            <div class="price-value">R$ 108.432</div>
+          </div>
+          <div class="price-item">
+            <div class="price-label">Avaliação</div>
+            <div class="price-value original">R$ 184.000</div>
+          </div>
+        </div>
+        <div class="card-meta">
+          
+          
+          
+          
+        </div>
+        <a href="https://venda-imoveis.caixa.gov.br/sistema/detalhe-imovel.asp?hdnimovel=8787709311706" target="_blank" class="card-link">Ver no Caixa Econômica →</a>
       </div>
     </div>
 
     <footer>
-      <p>Fonte: Portal Zuk, Leilão Imóvel • Gerado automaticamente por 🐦 Avê</p>
+      <p>Fontes: Portal Zuk, Caixa Econômica • Gerado automaticamente por 🐦 Avê</p>
       <p style="margin-top: 10px; font-size: 0.85em;">Filtros: Curitiba + Grande Curitiba | Desconto >40% | Preço <R$800k</p>
     </footer>
   </div>
