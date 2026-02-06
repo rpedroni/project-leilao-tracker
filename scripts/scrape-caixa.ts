@@ -106,10 +106,11 @@ export async function scrapeCaixa(): Promise<Property[]> {
     if (tipoMatch) tipo = titleCase(tipoMatch[1]);
 
     // Extract area from description
+    // Note: CSV encoding makes 'á' appear as 0xFD (ý). Use .rea to match any encoding.
     let area = '';
-    const areaPriv = descricao.match(/([\d.,]+) de área privativa/);
-    const areaTotal = descricao.match(/([\d.,]+) de área total/);
-    const areaTerreno = descricao.match(/([\d.,]+) de área do terreno/);
+    const areaPriv = descricao.match(/([\d.,]+)\s*de\s*.rea\s*privativa/i);
+    const areaTotal = descricao.match(/([\d.,]+)\s*de\s*.rea\s*total/i);
+    const areaTerreno = descricao.match(/([\d.,]+)\s*de\s*.rea\s*do\s*terreno/i);
     if (areaPriv && parseFloat(areaPriv[1]) > 0) {
       area = `${areaPriv[1]}m²`;
     } else if (areaTotal && parseFloat(areaTotal[1]) > 0) {
@@ -119,15 +120,35 @@ export async function scrapeCaixa(): Promise<Property[]> {
       area += area ? ` (terreno: ${areaTerreno[1]}m²)` : `terreno: ${areaTerreno[1]}m²`;
     }
 
-    // Detect "sem vagas" — Caixa CSV doesn't include this directly,
-    // but we flag apartments with 0 area total (common indicator) or
-    // explicit mentions in description
+    // Parse structured fields from description
     const descLower = descricao.toLowerCase();
-    const semVagas = descLower.includes('sem direito') && descLower.includes('vaga');
+
+    // Vagas de garagem
+    let vagas: number | undefined;
+    const vagaMatch = descricao.match(/(\d+)\s*vaga\(s\)\s*de\s*garagem/i);
+    if (vagaMatch) vagas = parseInt(vagaMatch[1]);
+
+    // Also check address for VAGA references
+    if (vagas === undefined) {
+      const addrVaga = endereco.match(/VAGA|GARAG/i);
+      if (addrVaga) vagas = 1; // Address mentions vaga = at least 1
+    }
+
+    // Quartos
+    let quartos: number | undefined;
+    const qtoMatch = descricao.match(/(\d+)\s*qto\(s\)/i);
+    if (qtoMatch) quartos = parseInt(qtoMatch[1]);
+
+    // Detect "sem vagas"
+    const semVagas = (descLower.includes('sem direito') && descLower.includes('vaga')) || vagas === 0;
     const alertas: string[] = [];
     if (semVagas) alertas.push('⛔ SEM VAGAS de garagem');
-    // Also flag apartments with avaliação much higher than price in priority neighborhoods
-    // (>40% off on paper can be misleading without context)
+
+    // Flag apartments with NO vaga info at all (suspicious)
+    const isResidential = ['apartamento', 'casa', 'sobrado', 'kitnet'].some(t => tipo.toLowerCase().includes(t));
+    if (isResidential && vagas === undefined && !semVagas) {
+      alertas.push('⚠️ Vagas não informadas');
+    }
 
     // Normalize bairro
     const bairroDisplay = titleCase(bairro.toLowerCase());
@@ -150,7 +171,10 @@ export async function scrapeCaixa(): Promise<Property[]> {
       prioridade: isPriorityNeighborhood(bairro),
       semVagas: semVagas || undefined,
       alertas: alertas.length > 0 ? alertas : undefined,
-    });
+      // Enrichment fields from CSV parsing
+      ...(vagas !== undefined ? { vagas } : {}),
+      ...(quartos !== undefined ? { quartos } : {}),
+    } as any);
   }
 
   log(`✅ Caixa: ${properties.length} properties parsed from CSV`);

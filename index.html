@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Leilão Tracker - 06/02/2026</title>
+  <title>Leilão Tracker - Atual</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { 
@@ -79,6 +79,29 @@
       font-size: 0.7em;
       font-weight: bold;
     }
+    .score-badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-weight: bold;
+      font-size: 0.8em;
+      margin-right: 8px;
+    }
+    .score-high { background: #238636; color: #fff; }
+    .score-mid { background: #d29922; color: #000; }
+    .score-low { background: #da3633; color: #fff; }
+    .m2-info {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 8px 0;
+      font-size: 0.85em;
+      color: #8b949e;
+    }
+    .m2-value { color: #58a6ff; font-weight: bold; }
+    .m2-comparison { font-size: 0.8em; }
+    .m2-below { color: #7ee787; }
+    .m2-above { color: #f85149; }
     .card-header { 
       display: flex; 
       justify-content: space-between; 
@@ -144,7 +167,7 @@
       <h1>🏠 Leilão Tracker</h1>
       <p>Oportunidades imobiliárias em Curitiba e região • 06/02/2026</p>
       <nav>
-        <a href="index.html" class="">Atual</a>
+        <a href="index.html" class="active">Atual</a>
         <a href="2026-02-06.html">06/02</a>
         <a href="2026-02-05.html">05/02</a>
         <a href="2026-02-04.html">04/02</a>
@@ -157,11 +180,11 @@
 
     <div class="stats">
       <div class="stat">
-        <div class="stat-value">96</div>
+        <div class="stat-value">78</div>
         <div class="stat-label">Acima de 40%</div>
       </div>
       <div class="stat">
-        <div class="stat-value">100</div>
+        <div class="stat-value">260</div>
         <div class="stat-label">Total Encontrados</div>
       </div>
       <div class="stat">
@@ -171,9 +194,9 @@
     </div>
 
     <div class="cards">
-      <div class="card top priority">
+      <div class="card top priority new">
         <div class="card-header">
-          <div class="card-title">🏠 Casa - Portão</div>
+          <div class="card-title"><span class="score-badge score-high">76/100</span>🏠 Casa - Portão</div>
           <div class="card-discount hot">-68%</div>
         </div>
         <div class="card-location">📍 Rua Marcelino Iachinski,  30</div>
@@ -187,17 +210,22 @@
             <div class="price-value original">R$ 1.215.733</div>
           </div>
         </div>
+        <div class="m2-info"><span class="m2-value">R$1.507/m²</span><span class="m2-comparison m2-below">77% abaixo da média (R$6.500/m²)</span></div>
         <div class="card-meta">
+          
+          
           <span class="meta-tag">254,62m² (terreno: 361,46m²)</span>
           <span class="meta-tag">Encerramento: 12/02/2026</span>
           <span class="meta-tag">⚠️ Ocupado</span>
           
+          
+          
         </div>
         <a href="https://www.portalzuk.com.br/imovel/pr/curitiba/portao/rua-marcelino-iachinski-30/34940-217512" target="_blank" class="card-link">Ver no Portal Zuk →</a>
       </div>
-      <div class="card top priority">
+      <div class="card top priority new">
         <div class="card-header">
-          <div class="card-title">🏪 Sala Comercial - Centro (São José dos Pinhais)</div>
+          <div class="card-title"><span class="score-badge score-high">69/100</span>🏪 Sala Comercial - Centro (São José dos Pinhais)</div>
           <div class="card-discount ">-50%</div>
         </div>
         <div class="card-location">📍 Rua Quinze de Novembro,  2175</div>
@@ -211,257 +239,51 @@
             <div class="price-value original">R$ 230.000</div>
           </div>
         </div>
+        <div class="m2-info"><span class="m2-value">R$3.286/m²</span><span class="m2-comparison m2-below">45% abaixo da média (R$6.000/m²)</span></div>
         <div class="card-meta">
+          
+          
           <span class="meta-tag">35,00m² útil</span>
           <span class="meta-tag">Encerramento: 18/02/2026</span>
           <span class="meta-tag">⚠️ Ocupado</span>
           
+          
+          
         </div>
         <a href="https://www.portalzuk.com.br/imovel/pr/sao-jose-dos-pinhais/centro/rua-quinze-de-novembro-2175/34937-215324" target="_blank" class="card-link">Ver no Portal Zuk →</a>
       </div>
-      <div class="card top priority">
+      <div class="card top new">
         <div class="card-header">
-          <div class="card-title">🏢 Apartamento - Jardim Social</div>
-          <div class="card-discount ">-45.83%</div>
+          <div class="card-title"><span class="score-badge score-high">67/100</span>🏘️ Gleba - Mato Dentro (Almirante Tamandare)</div>
+          <div class="card-discount ">-53.59%</div>
         </div>
-        <div class="card-location">📍 RUA CORONEL TEMISTOCLES DE SOUZA BRASIL, N. 208, Apto A42, BL A</div>
+        <div class="card-location">📍 RODOVIA DOS MINýRIOS, N. 6750, GLEBA</div>
         <div class="card-prices">
           <div class="price-item">
             <div class="price-label">Venda Direta Online</div>
-            <div class="price-value">R$ 742.153</div>
+            <div class="price-value">R$ 1.977.733</div>
           </div>
           <div class="price-item">
             <div class="price-label">Avaliação</div>
-            <div class="price-value original">R$ 1.370.000</div>
+            <div class="price-value original">R$ 4.261.000</div>
           </div>
         </div>
+        <div class="m2-info"><span class="m2-value">R$27/m²</span><span class="m2-comparison m2-below">99% abaixo da média (R$2.800/m²)</span></div>
         <div class="card-meta">
           
           
+          <span class="meta-tag">terreno: 72600.00m²</span>
+          
+          
+          
           
           
         </div>
-        <a href="https://venda-imoveis.caixa.gov.br/sistema/detalhe-imovel.asp?hdnimovel=10209029" target="_blank" class="card-link">Ver no Caixa Econômica →</a>
+        <a href="https://venda-imoveis.caixa.gov.br/sistema/detalhe-imovel.asp?hdnimovel=10139954" target="_blank" class="card-link">Ver no Caixa Econômica →</a>
       </div>
-      <div class="card top">
+      <div class="card top new">
         <div class="card-header">
-          <div class="card-title">🏠 Sobrado - Alto Boqueirão</div>
-          <div class="card-discount ">-50%</div>
-        </div>
-        <div class="card-location">📍 Rua Júlio Zandoná,  888</div>
-        <div class="card-prices">
-          <div class="price-item">
-            <div class="price-label">Leilão 2ª Praça</div>
-            <div class="price-value">R$ 341.800</div>
-          </div>
-          <div class="price-item">
-            <div class="price-label">Avaliação</div>
-            <div class="price-value original">R$ 683.600</div>
-          </div>
-        </div>
-        <div class="card-meta">
-          
-          <span class="meta-tag">Encerramento: 18/02/2026</span>
-          <span class="meta-tag">⚠️ Ocupado</span>
-          
-        </div>
-        <a href="https://www.portalzuk.com.br/imovel/pr/curitiba/alto-boqueirao/rua-julio-zandona-888/35174-216690" target="_blank" class="card-link">Ver no Portal Zuk →</a>
-      </div>
-      <div class="card top">
-        <div class="card-header">
-          <div class="card-title">🏠 Casa - Das Gracas (Colombo)</div>
-          <div class="card-discount ">-47.75%</div>
-        </div>
-        <div class="card-location">📍 RUA DO CAJUEIRO, N. 33, CS 02 LT 20 QD 36</div>
-        <div class="card-prices">
-          <div class="price-item">
-            <div class="price-label">Venda Online</div>
-            <div class="price-value">R$ 113.919</div>
-          </div>
-          <div class="price-item">
-            <div class="price-label">Avaliação</div>
-            <div class="price-value original">R$ 218.000</div>
-          </div>
-        </div>
-        <div class="card-meta">
-          
-          
-          
-          
-        </div>
-        <a href="https://venda-imoveis.caixa.gov.br/sistema/detalhe-imovel.asp?hdnimovel=8444403839212" target="_blank" class="card-link">Ver no Caixa Econômica →</a>
-      </div>
-      <div class="card">
-        <div class="card-header">
-          <div class="card-title">🏢 Apartamento - Bom Jesus (Campo Largo)</div>
-          <div class="card-discount ">-46.57%</div>
-        </div>
-        <div class="card-location">📍 RUA DOS EXPEDICIONARIOS, N. 1145, Apto 3325, BL 33</div>
-        <div class="card-prices">
-          <div class="price-item">
-            <div class="price-label">Venda Direta Online</div>
-            <div class="price-value">R$ 112.218</div>
-          </div>
-          <div class="price-item">
-            <div class="price-label">Avaliação</div>
-            <div class="price-value original">R$ 210.000</div>
-          </div>
-        </div>
-        <div class="card-meta">
-          
-          
-          
-          
-        </div>
-        <a href="https://venda-imoveis.caixa.gov.br/sistema/detalhe-imovel.asp?hdnimovel=8787705456220" target="_blank" class="card-link">Ver no Caixa Econômica →</a>
-      </div>
-      <div class="card">
-        <div class="card-header">
-          <div class="card-title">🏢 Apartamento - Bom Jesus (Campo Largo)</div>
-          <div class="card-discount ">-46.57%</div>
-        </div>
-        <div class="card-location">📍 RODOVIA DOS EXPEDICIONARIOS, N. 1145, Apto 916, TIPO03 BL09 VG320</div>
-        <div class="card-prices">
-          <div class="price-item">
-            <div class="price-label">Venda Direta Online</div>
-            <div class="price-value">R$ 109.546</div>
-          </div>
-          <div class="price-item">
-            <div class="price-label">Avaliação</div>
-            <div class="price-value original">R$ 205.000</div>
-          </div>
-        </div>
-        <div class="card-meta">
-          
-          
-          
-          
-        </div>
-        <a href="https://venda-imoveis.caixa.gov.br/sistema/detalhe-imovel.asp?hdnimovel=8787710403120" target="_blank" class="card-link">Ver no Caixa Econômica →</a>
-      </div>
-      <div class="card">
-        <div class="card-header">
-          <div class="card-title">🏢 Apartamento - Jardim Itaqui (Campo Largo)</div>
-          <div class="card-discount ">-46.09%</div>
-        </div>
-        <div class="card-location">📍 RUA MARIA JOAQUINA VAZ, N. 721, Apto 305, BL 26 VAGA 1111</div>
-        <div class="card-prices">
-          <div class="price-item">
-            <div class="price-label">Licita��o Aberta</div>
-            <div class="price-value">R$ 98.667</div>
-          </div>
-          <div class="price-item">
-            <div class="price-label">Avaliação</div>
-            <div class="price-value original">R$ 183.000</div>
-          </div>
-        </div>
-        <div class="card-meta">
-          
-          
-          
-          
-        </div>
-        <a href="https://venda-imoveis.caixa.gov.br/sistema/detalhe-imovel.asp?hdnimovel=8787704581454" target="_blank" class="card-link">Ver no Caixa Econômica →</a>
-      </div>
-      <div class="card">
-        <div class="card-header">
-          <div class="card-title">🏠 Casa - Estados (Fazenda Rio Grande)</div>
-          <div class="card-discount ">-44.91%</div>
-        </div>
-        <div class="card-location">📍 RUA PIEN (ESQ AVENIDA MATO GROSSO), N. 329, CS 79 AREA 29B-3</div>
-        <div class="card-prices">
-          <div class="price-item">
-            <div class="price-label">Licita��o Aberta</div>
-            <div class="price-value">R$ 121.216</div>
-          </div>
-          <div class="price-item">
-            <div class="price-label">Avaliação</div>
-            <div class="price-value original">R$ 220.000</div>
-          </div>
-        </div>
-        <div class="card-meta">
-          
-          
-          
-          
-        </div>
-        <a href="https://venda-imoveis.caixa.gov.br/sistema/detalhe-imovel.asp?hdnimovel=8787704262642" target="_blank" class="card-link">Ver no Caixa Econômica →</a>
-      </div>
-      <div class="card">
-        <div class="card-header">
-          <div class="card-title">🏠 Casa - Estados (Fazenda Rio Grande)</div>
-          <div class="card-discount ">-42.91%</div>
-        </div>
-        <div class="card-location">📍 RUA RIO DE JANEIRO, N. 447, CS 81</div>
-        <div class="card-prices">
-          <div class="price-item">
-            <div class="price-label">Venda Direta Online</div>
-            <div class="price-value">R$ 151.302</div>
-          </div>
-          <div class="price-item">
-            <div class="price-label">Avaliação</div>
-            <div class="price-value original">R$ 265.000</div>
-          </div>
-        </div>
-        <div class="card-meta">
-          
-          
-          
-          
-        </div>
-        <a href="https://venda-imoveis.caixa.gov.br/sistema/detalhe-imovel.asp?hdnimovel=8555531555707" target="_blank" class="card-link">Ver no Caixa Econômica →</a>
-      </div>
-      <div class="card">
-        <div class="card-header">
-          <div class="card-title">🏢 Apartamento - Jardim Itaqui (Campo Largo)</div>
-          <div class="card-discount ">-42.23%</div>
-        </div>
-        <div class="card-location">📍 RUA MARIA JOAQUINA VAZ, N. 721, Apto 301, PAV 03 BL 05 GARAGEM 151</div>
-        <div class="card-prices">
-          <div class="price-item">
-            <div class="price-label">Venda Direta Online</div>
-            <div class="price-value">R$ 99.956</div>
-          </div>
-          <div class="price-item">
-            <div class="price-label">Avaliação</div>
-            <div class="price-value original">R$ 173.000</div>
-          </div>
-        </div>
-        <div class="card-meta">
-          
-          
-          
-          
-        </div>
-        <a href="https://venda-imoveis.caixa.gov.br/sistema/detalhe-imovel.asp?hdnimovel=8787703926466" target="_blank" class="card-link">Ver no Caixa Econômica →</a>
-      </div>
-      <div class="card">
-        <div class="card-header">
-          <div class="card-title">🏢 Apartamento - Jardim Itaqui (Campo Largo)</div>
-          <div class="card-discount ">-42.23%</div>
-        </div>
-        <div class="card-location">📍 RUA MARIA JOAQUINA VAZ, N. 721, Apto 308, PAV 03 BL 26 GARAGEM 1108</div>
-        <div class="card-prices">
-          <div class="price-item">
-            <div class="price-label">Venda Direta Online</div>
-            <div class="price-value">R$ 98.223</div>
-          </div>
-          <div class="price-item">
-            <div class="price-label">Avaliação</div>
-            <div class="price-value original">R$ 170.000</div>
-          </div>
-        </div>
-        <div class="card-meta">
-          
-          
-          
-          
-        </div>
-        <a href="https://venda-imoveis.caixa.gov.br/sistema/detalhe-imovel.asp?hdnimovel=8787711041508" target="_blank" class="card-link">Ver no Caixa Econômica →</a>
-      </div>
-      <div class="card">
-        <div class="card-header">
-          <div class="card-title">🗺️ Terreno - Jardim Roma (Almirante Tamandare)</div>
+          <div class="card-title"><span class="score-badge score-high">63/100</span>🗺️ Terreno - Jardim Roma (Almirante Tamandare)</div>
           <div class="card-discount ">-42%</div>
         </div>
         <div class="card-location">📍 R ARAUCARIA, N. 506, LT 11 QD 16</div>
@@ -475,7 +297,12 @@
             <div class="price-value original">R$ 307.000</div>
           </div>
         </div>
+        <div class="m2-info"><span class="m2-value">R$412/m²</span><span class="m2-comparison m2-below">85% abaixo da média (R$2.800/m²)</span></div>
         <div class="card-meta">
+          
+          
+          <span class="meta-tag">terreno: 432.00m²</span>
+          
           
           
           
@@ -483,39 +310,218 @@
         </div>
         <a href="https://venda-imoveis.caixa.gov.br/sistema/detalhe-imovel.asp?hdnimovel=1444419118090" target="_blank" class="card-link">Ver no Caixa Econômica →</a>
       </div>
-      <div class="card">
+      <div class="card top new">
         <div class="card-header">
-          <div class="card-title">🏠 Casa - Jardim Esmeralda (Campo Largo)</div>
-          <div class="card-discount ">-41.62%</div>
+          <div class="card-title"><span class="score-badge score-high">62/100</span>🏢 Apartamento - Bom Jesus (Sao Jose Dos Pinhais)</div>
+          <div class="card-discount ">-37.06%</div>
         </div>
-        <div class="card-location">📍 RUA PROJETADA 01, N. SN, CS 40 LT 01</div>
+        <div class="card-location">📍 RUA BARAO DO CERRO AZUL, N. 3025, Apto 404A,  VAGA 22</div>
         <div class="card-prices">
           <div class="price-item">
-            <div class="price-label">Venda Online</div>
-            <div class="price-value">R$ 171.662</div>
+            <div class="price-label">Licitaýýo Aberta</div>
+            <div class="price-value">R$ 135.326</div>
           </div>
           <div class="price-item">
             <div class="price-label">Avaliação</div>
-            <div class="price-value original">R$ 294.000</div>
+            <div class="price-value original">R$ 215.000</div>
           </div>
         </div>
+        <div class="m2-info"><span class="m2-value">R$2.071/m²</span><span class="m2-comparison m2-below">48% abaixo da média (R$4.000/m²)</span></div>
+        <div class="card-meta">
+          <span class="meta-tag">🛏️ 3 qtos</span>
+          <span class="meta-tag">🅿️ 1 vaga</span>
+          <span class="meta-tag">65.35m²</span>
+          
+          
+          
+          
+          
+        </div>
+        <a href="https://venda-imoveis.caixa.gov.br/sistema/detalhe-imovel.asp?hdnimovel=1787700056780" target="_blank" class="card-link">Ver no Caixa Econômica →</a>
+      </div>
+      <div class="card priority new">
+        <div class="card-header">
+          <div class="card-title"><span class="score-badge score-high">60/100</span>🏪 Sala Comercial - Batel</div>
+          
+        </div>
+        <div class="card-location">📍 Avenida Sete de Setembro,  4848</div>
+        <div class="card-prices">
+          <div class="price-item">
+            <div class="price-label">Leilão</div>
+            <div class="price-value">R$ 300.000</div>
+          </div>
+          <div class="price-item">
+            <div class="price-label">Avaliação</div>
+            <div class="price-value original">R$ 300.000</div>
+          </div>
+        </div>
+        <div class="m2-info"><span class="m2-value">R$5.846/m²</span><span class="m2-comparison m2-below">53% abaixo da média (R$12.500/m²)</span></div>
         <div class="card-meta">
           
           
+          <span class="meta-tag">51,32m² útil</span>
+          <span class="meta-tag">Encerramento: 08/02/2026</span>
+          <span class="meta-tag">⚠️ Ocupado</span>
+          
           
           
         </div>
-        <a href="https://venda-imoveis.caixa.gov.br/sistema/detalhe-imovel.asp?hdnimovel=8444414478623" target="_blank" class="card-link">Ver no Caixa Econômica →</a>
+        <a href="https://www.portalzuk.com.br/imovel/pr/curitiba/batel/avenida-sete-de-setembro-4848/35312-217688" target="_blank" class="card-link">Ver no Portal Zuk →</a>
       </div>
-      <div class="card">
+      <div class="card new">
         <div class="card-header">
-          <div class="card-title">🏢 Apartamento - Estancia Pinhais (Pinhais)</div>
+          <div class="card-title"><span class="score-badge score-high">60/100</span>🏢 Apartamento - Aristocrata (Sao Jose Dos Pinhais)</div>
+          <div class="card-discount ">-40.92%</div>
+        </div>
+        <div class="card-location">📍 AVENIDA RUI BARBOSA, N. 11605, Apto 24, TIPO A, BLOCO 16</div>
+        <div class="card-prices">
+          <div class="price-item">
+            <div class="price-label">Venda Online</div>
+            <div class="price-value">R$ 100.451</div>
+          </div>
+          <div class="price-item">
+            <div class="price-label">Avaliação</div>
+            <div class="price-value original">R$ 170.000</div>
+          </div>
+        </div>
+        <div class="m2-info"><span class="m2-value">R$2.450/m²</span><span class="m2-comparison m2-below">39% abaixo da média (R$4.000/m²)</span></div>
+        <div class="card-meta">
+          <span class="meta-tag">🛏️ 2 qtos</span>
+          <span class="meta-tag">🅿️ 1 vaga</span>
+          <span class="meta-tag">41.00m²</span>
+          
+          
+          
+          
+          
+        </div>
+        <a href="https://venda-imoveis.caixa.gov.br/sistema/detalhe-imovel.asp?hdnimovel=1444417013828" target="_blank" class="card-link">Ver no Caixa Econômica →</a>
+      </div>
+      <div class="card priority new">
+        <div class="card-header">
+          <div class="card-title"><span class="score-badge score-mid">57/100</span>🏢 Apartamento - Cristo Rei (Campo Largo)</div>
+          
+        </div>
+        <div class="card-location">📍 RUA ATOS DOS APOSTOLOS, N. 98, Apto 308, BL 07</div>
+        <div class="card-prices">
+          <div class="price-item">
+            <div class="price-label">Leilýo SFI - Edital ýnico</div>
+            <div class="price-value">R$ 166.000</div>
+          </div>
+          <div class="price-item">
+            <div class="price-label">Avaliação</div>
+            <div class="price-value original">R$ 166.000</div>
+          </div>
+        </div>
+        <div class="m2-info"><span class="m2-value">R$3.331/m²</span><span class="m2-comparison m2-below">57% abaixo da média (R$7.800/m²)</span></div>
+        <div class="card-meta">
+          <span class="meta-tag">🛏️ 2 qtos</span>
+          <span class="meta-tag">🅿️ 1 vaga</span>
+          <span class="meta-tag">49.84m²</span>
+          
+          
+          
+          
+          
+        </div>
+        <a href="https://venda-imoveis.caixa.gov.br/sistema/detalhe-imovel.asp?hdnimovel=8787714920006" target="_blank" class="card-link">Ver no Caixa Econômica →</a>
+      </div>
+      <div class="card priority new">
+        <div class="card-header">
+          <div class="card-title"><span class="score-badge score-mid">57/100</span>🏢 Apartamento - Bigorrilho</div>
+          
+        </div>
+        <div class="card-location">📍 RUA MARTIM AFONSO, N. 1900, Apto 1002, LOTE 299 E 301 INDICAýýO FISCAL 13-061</div>
+        <div class="card-prices">
+          <div class="price-item">
+            <div class="price-label">Leilýo SFI - Edital ýnico</div>
+            <div class="price-value">R$ 586.000</div>
+          </div>
+          <div class="price-item">
+            <div class="price-label">Avaliação</div>
+            <div class="price-value original">R$ 586.000</div>
+          </div>
+        </div>
+        <div class="m2-info"><span class="m2-value">R$4.652/m²</span><span class="m2-comparison m2-below">53% abaixo da média (R$10.000/m²)</span></div>
+        <div class="card-meta">
+          <span class="meta-tag">🛏️ 3 qtos</span>
+          <span class="meta-tag">🅿️ 1 vaga</span>
+          <span class="meta-tag">125.96m²</span>
+          
+          
+          
+          
+          
+        </div>
+        <a href="https://venda-imoveis.caixa.gov.br/sistema/detalhe-imovel.asp?hdnimovel=1444401008382" target="_blank" class="card-link">Ver no Caixa Econômica →</a>
+      </div>
+      <div class="card new">
+        <div class="card-header">
+          <div class="card-title"><span class="score-badge score-mid">57/100</span>🏢 Apartamento - Jardim Iruama (Campo Largo)</div>
+          <div class="card-discount ">-40.75%</div>
+        </div>
+        <div class="card-location">📍 RUA REINALDO GADENS, N. 210, Apto 2513, BL 25 VAGA 257</div>
+        <div class="card-prices">
+          <div class="price-item">
+            <div class="price-label">Licitaýýo Aberta</div>
+            <div class="price-value">R$ 96.000</div>
+          </div>
+          <div class="price-item">
+            <div class="price-label">Avaliação</div>
+            <div class="price-value original">R$ 162.000</div>
+          </div>
+        </div>
+        <div class="m2-info"><span class="m2-value">R$2.206/m²</span><span class="m2-comparison m2-below">33% abaixo da média (R$3.300/m²)</span></div>
+        <div class="card-meta">
+          <span class="meta-tag">🛏️ 2 qtos</span>
+          <span class="meta-tag">🅿️ 1 vaga</span>
+          <span class="meta-tag">43.51m²</span>
+          
+          
+          
+          
+          
+        </div>
+        <a href="https://venda-imoveis.caixa.gov.br/sistema/detalhe-imovel.asp?hdnimovel=8555535031052" target="_blank" class="card-link">Ver no Caixa Econômica →</a>
+      </div>
+      <div class="card new">
+        <div class="card-header">
+          <div class="card-title"><span class="score-badge score-mid">57/100</span>🏢 Apartamento - Jardim Campo Verde (Almirante Tamandare)</div>
+          <div class="card-discount ">-40.75%</div>
+        </div>
+        <div class="card-location">📍 RUA MANOEL BARBOSA, N. 207, Apto 1622, BL 16 VG 78</div>
+        <div class="card-prices">
+          <div class="price-item">
+            <div class="price-label">Venda Direta Online</div>
+            <div class="price-value">R$ 107.852</div>
+          </div>
+          <div class="price-item">
+            <div class="price-label">Avaliação</div>
+            <div class="price-value original">R$ 182.000</div>
+          </div>
+        </div>
+        <div class="m2-info"><span class="m2-value">R$1.877/m²</span><span class="m2-comparison m2-below">33% abaixo da média (R$2.800/m²)</span></div>
+        <div class="card-meta">
+          <span class="meta-tag">🛏️ 2 qtos</span>
+          <span class="meta-tag">🅿️ 1 vaga</span>
+          <span class="meta-tag">57.46m²</span>
+          
+          
+          
+          
+          
+        </div>
+        <a href="https://venda-imoveis.caixa.gov.br/sistema/detalhe-imovel.asp?hdnimovel=8787710167516" target="_blank" class="card-link">Ver no Caixa Econômica →</a>
+      </div>
+      <div class="card new">
+        <div class="card-header">
+          <div class="card-title"><span class="score-badge score-mid">56/100</span>🏢 Apartamento - Estancia Pinhais (Pinhais)</div>
           <div class="card-discount ">-41.62%</div>
         </div>
         <div class="card-location">📍 RUA TREZE DE MAIO, N. 913, Apto 04, PAV 03 VG 04</div>
         <div class="card-prices">
           <div class="price-item">
-            <div class="price-label">Licita��o Aberta</div>
+            <div class="price-label">Licitaýýo Aberta</div>
             <div class="price-value">R$ 166.407</div>
           </div>
           <div class="price-item">
@@ -523,7 +529,12 @@
             <div class="price-value original">R$ 285.000</div>
           </div>
         </div>
+        <div class="m2-info"><span class="m2-value">R$2.606/m²</span><span class="m2-comparison m2-below">31% abaixo da média (R$3.800/m²)</span></div>
         <div class="card-meta">
+          <span class="meta-tag">🛏️ 2 qtos</span>
+          <span class="meta-tag">🅿️ 1 vaga</span>
+          <span class="meta-tag">63.86m²</span>
+          
           
           
           
@@ -531,125 +542,237 @@
         </div>
         <a href="https://venda-imoveis.caixa.gov.br/sistema/detalhe-imovel.asp?hdnimovel=1444413047957" target="_blank" class="card-link">Ver no Caixa Econômica →</a>
       </div>
-      <div class="card">
+      <div class="card new">
         <div class="card-header">
-          <div class="card-title">🏠 Casa - Campina Da Barra (Araucaria)</div>
-          <div class="card-discount ">-41.45%</div>
+          <div class="card-title"><span class="score-badge score-mid">56/100</span>🏢 Apartamento - Italia (Sao Jose Dos Pinhais)</div>
+          <div class="card-discount ">-40.75%</div>
         </div>
-        <div class="card-location">📍 RUA MARGARIDA, N. 970, CS 02 QD A</div>
+        <div class="card-location">📍 RUA PEDRINA COSTA VISKI, N. 788, Apto 101, BL 06 VAGA 37</div>
+        <div class="card-prices">
+          <div class="price-item">
+            <div class="price-label">Licitaýýo Aberta</div>
+            <div class="price-value">R$ 105.633</div>
+          </div>
+          <div class="price-item">
+            <div class="price-label">Avaliação</div>
+            <div class="price-value original">R$ 178.255</div>
+          </div>
+        </div>
+        <div class="m2-info"><span class="m2-value">R$2.751/m²</span><span class="m2-comparison m2-below">31% abaixo da média (R$4.000/m²)</span></div>
+        <div class="card-meta">
+          <span class="meta-tag">🛏️ 2 qtos</span>
+          <span class="meta-tag">🅿️ 1 vaga</span>
+          <span class="meta-tag">38.40m²</span>
+          
+          
+          
+          
+          
+        </div>
+        <a href="https://venda-imoveis.caixa.gov.br/sistema/detalhe-imovel.asp?hdnimovel=8787707924212" target="_blank" class="card-link">Ver no Caixa Econômica →</a>
+      </div>
+      <div class="card new">
+        <div class="card-header">
+          <div class="card-title"><span class="score-badge score-mid">56/100</span>🏠 Casa - Parque Da Fonte (Sao Jose Dos Pinhais)</div>
+          <div class="card-discount ">-40.47%</div>
+        </div>
+        <div class="card-location">📍 RUA LUZIANO CORDEIRO, N. 1898, Apto 1, 01</div>
         <div class="card-prices">
           <div class="price-item">
             <div class="price-label">Venda Online</div>
-            <div class="price-value">R$ 138.199</div>
+            <div class="price-value">R$ 568.544</div>
           </div>
           <div class="price-item">
             <div class="price-label">Avaliação</div>
-            <div class="price-value original">R$ 236.000</div>
+            <div class="price-value original">R$ 955.000</div>
           </div>
         </div>
+        <div class="m2-info"><span class="m2-value">R$2.673/m²</span><span class="m2-comparison m2-below">33% abaixo da média (R$4.000/m²)</span></div>
         <div class="card-meta">
+          <span class="meta-tag">🛏️ 2 qtos</span>
+          <span class="meta-tag">🅿️ 1 vaga</span>
+          <span class="meta-tag">212.73m² (terreno: 243.75m²)</span>
+          
           
           
           
           
         </div>
-        <a href="https://venda-imoveis.caixa.gov.br/sistema/detalhe-imovel.asp?hdnimovel=8444418914215" target="_blank" class="card-link">Ver no Caixa Econômica →</a>
+        <a href="https://venda-imoveis.caixa.gov.br/sistema/detalhe-imovel.asp?hdnimovel=1600000173286" target="_blank" class="card-link">Ver no Caixa Econômica →</a>
       </div>
-      <div class="card">
+      <div class="card new">
         <div class="card-header">
-          <div class="card-title">🏢 Apartamento - Santa Candida</div>
-          <div class="card-discount ">-41.45%</div>
+          <div class="card-title"><span class="score-badge score-mid">55/100</span>🏢 Apartamento - Jardim Itaqui (Campo Largo)</div>
+          <div class="card-discount ">-40.75%</div>
         </div>
-        <div class="card-location">📍 RUA PADRE PAULO CANELLES, N. 349, Apto 904, BL 09</div>
-        <div class="card-prices">
-          <div class="price-item">
-            <div class="price-label">Licita��o Aberta</div>
-            <div class="price-value">R$ 140.541</div>
-          </div>
-          <div class="price-item">
-            <div class="price-label">Avaliação</div>
-            <div class="price-value original">R$ 240.000</div>
-          </div>
-        </div>
-        <div class="card-meta">
-          
-          
-          
-          
-        </div>
-        <a href="https://venda-imoveis.caixa.gov.br/sistema/detalhe-imovel.asp?hdnimovel=8444423420543" target="_blank" class="card-link">Ver no Caixa Econômica →</a>
-      </div>
-      <div class="card">
-        <div class="card-header">
-          <div class="card-title">🏠 Casa - Veneza (Fazenda Rio Grande)</div>
-          <div class="card-discount ">-41.45%</div>
-        </div>
-        <div class="card-location">📍 RUA NOEL ROSA, N. 280, CS 03</div>
+        <div class="card-location">📍 RUA MARIA JOAQUINA VAZ, N. 721, Apto 208, TIPO 46 PAV 02 BL 32 VG 805</div>
         <div class="card-prices">
           <div class="price-item">
             <div class="price-label">Venda Online</div>
-            <div class="price-value">R$ 161.623</div>
+            <div class="price-value">R$ 102.519</div>
           </div>
           <div class="price-item">
             <div class="price-label">Avaliação</div>
-            <div class="price-value original">R$ 276.000</div>
+            <div class="price-value original">R$ 173.000</div>
           </div>
         </div>
+        <div class="m2-info"><span class="m2-value">R$2.351/m²</span><span class="m2-comparison m2-below">29% abaixo da média (R$3.300/m²)</span></div>
         <div class="card-meta">
+          <span class="meta-tag">🛏️ 2 qtos</span>
+          <span class="meta-tag">🅿️ 1 vaga</span>
+          <span class="meta-tag">43.61m²</span>
+          
           
           
           
           
         </div>
-        <a href="https://venda-imoveis.caixa.gov.br/sistema/detalhe-imovel.asp?hdnimovel=8444407371401" target="_blank" class="card-link">Ver no Caixa Econômica →</a>
+        <a href="https://venda-imoveis.caixa.gov.br/sistema/detalhe-imovel.asp?hdnimovel=8787701930377" target="_blank" class="card-link">Ver no Caixa Econômica →</a>
       </div>
-      <div class="card">
+      <div class="card new">
         <div class="card-header">
-          <div class="card-title">🏢 Apartamento - Bairro Bonfim (Almirante Tamandare)</div>
-          <div class="card-discount ">-41.07%</div>
+          <div class="card-title"><span class="score-badge score-mid">55/100</span>🏢 Apartamento - Afonso Pena (Sao Jose Dos Pinhais)</div>
+          <div class="card-discount ">-40%</div>
         </div>
-        <div class="card-location">📍 RUA ALFREDO DE ANDRADE, N. 75, Apto 305, BL 12</div>
+        <div class="card-location">📍 RUA ALMIRANTE ALEXANDRINO, N. 290, Apto 301, BL 42</div>
+        <div class="card-prices">
+          <div class="price-item">
+            <div class="price-label">Leilýo SFI - Edital ýnico</div>
+            <div class="price-value">R$ 149.701</div>
+          </div>
+          <div class="price-item">
+            <div class="price-label">Avaliação</div>
+            <div class="price-value original">R$ 249.502</div>
+          </div>
+        </div>
+        <div class="m2-info"><span class="m2-value">R$2.706/m²</span><span class="m2-comparison m2-below">32% abaixo da média (R$4.000/m²)</span></div>
+        <div class="card-meta">
+          <span class="meta-tag">🛏️ 3 qtos</span>
+          <span class="meta-tag">🅿️ 1 vaga</span>
+          <span class="meta-tag">55.33m²</span>
+          
+          
+          
+          
+          
+        </div>
+        <a href="https://venda-imoveis.caixa.gov.br/sistema/detalhe-imovel.asp?hdnimovel=8555511208890" target="_blank" class="card-link">Ver no Caixa Econômica →</a>
+      </div>
+      <div class="card new">
+        <div class="card-header">
+          <div class="card-title"><span class="score-badge score-mid">54/100</span>🏢 Apartamento - Jardim Itaqui (Campo Largo)</div>
+          <div class="card-discount ">-46.09%</div>
+        </div>
+        <div class="card-location">📍 RUA MARIA JOAQUINA VAZ, N. 721, Apto 305, BL 26 VAGA 1111</div>
+        <div class="card-prices">
+          <div class="price-item">
+            <div class="price-label">Licitaýýo Aberta</div>
+            <div class="price-value">R$ 98.667</div>
+          </div>
+          <div class="price-item">
+            <div class="price-label">Avaliação</div>
+            <div class="price-value original">R$ 183.000</div>
+          </div>
+        </div>
+        <div class="m2-info"><span class="m2-value">R$2.448/m²</span><span class="m2-comparison m2-below">26% abaixo da média (R$3.300/m²)</span></div>
+        <div class="card-meta">
+          <span class="meta-tag">🛏️ 2 qtos</span>
+          <span class="meta-tag">🅿️ 1 vaga</span>
+          <span class="meta-tag">40.31m²</span>
+          
+          
+          
+          
+          
+        </div>
+        <a href="https://venda-imoveis.caixa.gov.br/sistema/detalhe-imovel.asp?hdnimovel=8787704581454" target="_blank" class="card-link">Ver no Caixa Econômica →</a>
+      </div>
+      <div class="card new">
+        <div class="card-header">
+          <div class="card-title"><span class="score-badge score-mid">54/100</span>🏢 Apartamento - Jardim Itaqui (Campo Largo)</div>
+          <div class="card-discount ">-40.75%</div>
+        </div>
+        <div class="card-location">📍 RUA MARIA JOAQUINA VAZ, N. 721, Apto 101, BL 12 TIPO 28 VG 542</div>
         <div class="card-prices">
           <div class="price-item">
             <div class="price-label">Venda Direta Online</div>
-            <div class="price-value">R$ 109.610</div>
+            <div class="price-value">R$ 96.593</div>
           </div>
           <div class="price-item">
             <div class="price-label">Avaliação</div>
-            <div class="price-value original">R$ 186.000</div>
+            <div class="price-value original">R$ 163.000</div>
           </div>
         </div>
+        <div class="m2-info"><span class="m2-value">R$2.396/m²</span><span class="m2-comparison m2-below">27% abaixo da média (R$3.300/m²)</span></div>
         <div class="card-meta">
+          <span class="meta-tag">🛏️ 2 qtos</span>
+          <span class="meta-tag">🅿️ 1 vaga</span>
+          <span class="meta-tag">40.31m²</span>
+          
           
           
           
           
         </div>
-        <a href="https://venda-imoveis.caixa.gov.br/sistema/detalhe-imovel.asp?hdnimovel=8787708644361" target="_blank" class="card-link">Ver no Caixa Econômica →</a>
+        <a href="https://venda-imoveis.caixa.gov.br/sistema/detalhe-imovel.asp?hdnimovel=8787706535107" target="_blank" class="card-link">Ver no Caixa Econômica →</a>
       </div>
-      <div class="card">
+      <div class="card new">
         <div class="card-header">
-          <div class="card-title">🏢 Apartamento - Cond Colina Do Sol (Almirante Tamandare)</div>
-          <div class="card-discount ">-41.07%</div>
+          <div class="card-title"><span class="score-badge score-mid">54/100</span>🏢 Apartamento - Jardim Itaqui (Campo Largo)</div>
+          <div class="card-discount ">-40.75%</div>
         </div>
-        <div class="card-location">📍 RUA MANOEL BARBOSA, N. 207, Apto 9911, BL 99, VG 385</div>
+        <div class="card-location">📍 RUA MARIA JOAQUINA VAZ, N. 721, Apto 205, TIPO 19 BLOCO 12</div>
         <div class="card-prices">
           <div class="price-item">
             <div class="price-label">Venda Direta Online</div>
-            <div class="price-value">R$ 108.432</div>
+            <div class="price-value">R$ 97.186</div>
           </div>
           <div class="price-item">
             <div class="price-label">Avaliação</div>
-            <div class="price-value original">R$ 184.000</div>
+            <div class="price-value original">R$ 164.000</div>
           </div>
         </div>
+        <div class="m2-info"><span class="m2-value">R$2.411/m²</span><span class="m2-comparison m2-below">27% abaixo da média (R$3.300/m²)</span></div>
         <div class="card-meta">
+          <span class="meta-tag">🛏️ 2 qtos</span>
+          <span class="meta-tag">🅿️ 1 vaga</span>
+          <span class="meta-tag">40.31m²</span>
+          
           
           
           
           
         </div>
-        <a href="https://venda-imoveis.caixa.gov.br/sistema/detalhe-imovel.asp?hdnimovel=8787709311706" target="_blank" class="card-link">Ver no Caixa Econômica →</a>
+        <a href="https://venda-imoveis.caixa.gov.br/sistema/detalhe-imovel.asp?hdnimovel=8787703381265" target="_blank" class="card-link">Ver no Caixa Econômica →</a>
+      </div>
+      <div class="card new">
+        <div class="card-header">
+          <div class="card-title"><span class="score-badge score-mid">54/100</span>🏢 Apartamento - Costeira (Araucaria)</div>
+          <div class="card-discount ">-39.56%</div>
+        </div>
+        <div class="card-location">📍 RUA JOSE GONDEK, N. 133, Apto 43, BL G VAGA 220</div>
+        <div class="card-prices">
+          <div class="price-item">
+            <div class="price-label">Licitaýýo Aberta</div>
+            <div class="price-value">R$ 114.839</div>
+          </div>
+          <div class="price-item">
+            <div class="price-label">Avaliação</div>
+            <div class="price-value original">R$ 190.000</div>
+          </div>
+        </div>
+        <div class="m2-info"><span class="m2-value">R$2.473/m²</span><span class="m2-comparison m2-below">29% abaixo da média (R$3.500/m²)</span></div>
+        <div class="card-meta">
+          <span class="meta-tag">🛏️ 2 qtos</span>
+          <span class="meta-tag">🅿️ 1 vaga</span>
+          <span class="meta-tag">46.43m²</span>
+          
+          
+          
+          
+          
+        </div>
+        <a href="https://venda-imoveis.caixa.gov.br/sistema/detalhe-imovel.asp?hdnimovel=8555532042053" target="_blank" class="card-link">Ver no Caixa Econômica →</a>
       </div>
     </div>
 

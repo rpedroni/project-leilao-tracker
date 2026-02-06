@@ -5,6 +5,7 @@ import { scrapeLeilaoImovel } from './scrape-leilaoimovel.ts';
 import { scrapeCaixa } from './scrape-caixa.ts';
 import { deduplicateProperties, markNewProperties } from './deduplicate.ts';
 import { generateHTML } from './generate-html.ts';
+import { enrichProperties } from './enrich-properties.ts';
 import type { Property } from './types.ts';
 import { log, formatDate } from './utils.ts';
 import { existsSync } from 'fs';
@@ -105,26 +106,30 @@ async function runDaily() {
       }
     }
     
-    // Step 4: Save today's data
-    log('Step 4: Saving data...');
+    // Step 4: Enrich properties with scoring, R$/m², and alert detection
+    log('Step 4: Enriching properties...');
+    const enriched = enrichProperties(withNewFlags);
+    
+    // Step 5: Save today's data
+    log('Step 5: Saving data...');
     const today = formatDate();
     const todayFile = join(DATA_DIR, `${today}.json`);
-    await Bun.write(todayFile, JSON.stringify(withNewFlags, null, 2));
-    log(`Saved ${withNewFlags.length} properties to ${todayFile}`);
+    await Bun.write(todayFile, JSON.stringify(enriched, null, 2));
+    log(`Saved ${enriched.length} properties to ${todayFile}`);
     
-    // Step 5: Generate HTML pages
-    log('Step 5: Generating HTML...');
+    // Step 6: Generate HTML pages
+    log('Step 6: Generating HTML...');
     
     // Generate today's snapshot
     const todayHtml = join(ROOT_DIR, `${today}.html`);
-    await generateHTML(withNewFlags, todayHtml, false);
+    await generateHTML(enriched, todayHtml, false);
     
     // Generate index.html (current)
     const indexHtml = join(ROOT_DIR, 'index.html');
-    await generateHTML(withNewFlags, indexHtml, true);
+    await generateHTML(enriched, indexHtml, true);
     
-    // Step 6: Git commit and push
-    log('Step 6: Committing to git...');
+    // Step 7: Git commit and push
+    log('Step 7: Committing to git...');
     await gitCommitAndPush(today, withNewFlags.length);
     
     // Summary

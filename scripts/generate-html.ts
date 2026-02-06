@@ -104,6 +104,29 @@ export async function generateHTML(
       font-size: 0.7em;
       font-weight: bold;
     }
+    .score-badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-weight: bold;
+      font-size: 0.8em;
+      margin-right: 8px;
+    }
+    .score-high { background: #238636; color: #fff; }
+    .score-mid { background: #d29922; color: #000; }
+    .score-low { background: #da3633; color: #fff; }
+    .m2-info {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 8px 0;
+      font-size: 0.85em;
+      color: #8b949e;
+    }
+    .m2-value { color: #58a6ff; font-weight: bold; }
+    .m2-comparison { font-size: 0.8em; }
+    .m2-below { color: #7ee787; }
+    .m2-above { color: #f85149; }
     .card-header { 
       display: flex; 
       justify-content: space-between; 
@@ -218,9 +241,42 @@ function generatePropertyCard(property: Property, isTop: boolean = false): strin
     property.novo ? 'new' : ''
   ].filter(Boolean).join(' ');
   
+  // Score badge
+  const scoreVal = (property as any).score || 0;
+  const scoreClass = scoreVal >= 60 ? 'score-high' : scoreVal >= 40 ? 'score-mid' : 'score-low';
+  const scoreBadge = scoreVal > 0 ? `<span class="score-badge ${scoreClass}">${scoreVal}/100</span>` : '';
+
+  // R$/m² info
+  const precoM2 = (property as any).precoM2;
+  const mediaM2 = (property as any).mediaM2Bairro;
+  const descontoReal = (property as any).descontoReal;
+  let m2Html = '';
+  if (precoM2) {
+    const m2Formatted = `R$${precoM2.toLocaleString('pt-BR')}/m²`;
+    let compHtml = '';
+    if (mediaM2 && descontoReal !== undefined) {
+      const compClass = descontoReal >= 0 ? 'm2-below' : 'm2-above';
+      const compText = descontoReal >= 0
+        ? `${descontoReal}% abaixo da média (R$${mediaM2.toLocaleString('pt-BR')}/m²)`
+        : `${Math.abs(descontoReal)}% ACIMA da média (R$${mediaM2.toLocaleString('pt-BR')}/m²)`;
+      compHtml = `<span class="m2-comparison ${compClass}">${compText}</span>`;
+    }
+    m2Html = `<div class="m2-info"><span class="m2-value">${m2Formatted}</span>${compHtml}</div>`;
+  }
+
+  // Vagas info
+  const vagas = (property as any).vagas;
+  const vagasTag = vagas !== undefined
+    ? (vagas > 0 ? `<span class="meta-tag">🅿️ ${vagas} vaga${vagas > 1 ? 's' : ''}</span>` : '<span class="meta-tag" style="background:#da3633;color:#fff">⛔ 0 vagas</span>')
+    : '';
+
+  // Quartos info
+  const quartos = (property as any).quartos;
+  const quartosTag = quartos ? `<span class="meta-tag">🛏️ ${quartos} qto${quartos > 1 ? 's' : ''}</span>` : '';
+
   return `      <div class="${cardClass}">
         <div class="card-header">
-          <div class="card-title">${typeEmoji} ${property.tipo} - ${property.bairro}</div>
+          <div class="card-title">${scoreBadge}${typeEmoji} ${property.tipo} - ${property.bairro}</div>
           ${property.desconto ? `<div class="card-discount ${discountClass}">-${property.desconto}%</div>` : ''}
         </div>
         <div class="card-location">📍 ${property.endereco}</div>
@@ -234,7 +290,10 @@ function generatePropertyCard(property: Property, isTop: boolean = false): strin
             <div class="price-value original">${formatCurrency(property.avaliacao)}</div>
           </div>` : ''}
         </div>
+        ${m2Html}
         <div class="card-meta">
+          ${quartosTag}
+          ${vagasTag}
           ${property.area ? `<span class="meta-tag">${property.area}</span>` : ''}
           ${property.encerramento ? `<span class="meta-tag">Encerramento: ${formatDateBR(new Date(property.encerramento))}</span>` : ''}
           ${property.ocupacao === 'ocupado' ? '<span class="meta-tag">⚠️ Ocupado</span>' : ''}

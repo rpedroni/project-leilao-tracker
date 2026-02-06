@@ -20,6 +20,20 @@ export interface Property {
   semVagas?: boolean;
   /** Warnings/red flags detected during scraping */
   alertas?: string[];
+  /** Number of bedrooms */
+  quartos?: number;
+  /** Number of garage spots */
+  vagas?: number;
+  /** Price per m² */
+  precoM2?: number;
+  /** Neighborhood avg R$/m² for comparison */
+  mediaM2Bairro?: number;
+  /** Real discount vs market R$/m² */
+  descontoReal?: number;
+  /** Deal quality score 0-100 */
+  score?: number;
+  /** Score breakdown explanation */
+  scoreBreakdown?: string;
 }
 
 export const PRIORITY_NEIGHBORHOODS = [
