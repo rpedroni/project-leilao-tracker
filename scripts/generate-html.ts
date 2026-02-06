@@ -23,6 +23,16 @@ export async function generateHTML(
   // Get recent dates for navigation (last 7 days)
   const recentDates = getRecentDates(7);
   
+  // Extract unique types and neighborhoods for filters
+  const uniqueTypes = [...new Set(properties.map(p => p.tipo))].sort();
+  const uniqueNeighborhoods = [...new Set(properties.map(p => p.bairro))].sort();
+  const uniqueSources = getUniqueSources(properties);
+  const propertiesWithScore = properties.filter(p => (p as any).score > 0).length;
+  const avgScore = propertiesWithScore > 0
+    ? Math.round(properties.reduce((s, p) => s + ((p as any).score || 0), 0) / propertiesWithScore)
+    : 0;
+  const belowMarket = properties.filter(p => (p as any).descontoReal && (p as any).descontoReal > 0).length;
+
   const html = `<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -37,12 +47,12 @@ export async function generateHTML(
       color: #c9d1d9; 
       line-height: 1.6; 
     }
-    .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+    .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
     header { 
       text-align: center; 
       padding: 30px 0; 
       border-bottom: 1px solid #30363d; 
-      margin-bottom: 30px; 
+      margin-bottom: 20px; 
     }
     header h1 { color: #58a6ff; font-size: 2em; margin-bottom: 10px; }
     header p { color: #8b949e; }
@@ -61,21 +71,123 @@ export async function generateHTML(
       background: #21262d; 
     }
     nav a:hover, nav a.active { background: #388bfd; color: #fff; }
+
+    /* --- Stats --- */
     .stats { 
       display: grid; 
-      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); 
-      gap: 15px; 
-      margin-bottom: 30px; 
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); 
+      gap: 12px; 
+      margin-bottom: 20px; 
     }
     .stat { 
       background: #161b22; 
-      padding: 20px; 
+      padding: 16px; 
       border-radius: 8px; 
       text-align: center; 
       border: 1px solid #30363d; 
     }
-    .stat-value { font-size: 2em; font-weight: bold; color: #58a6ff; }
-    .stat-label { color: #8b949e; font-size: 0.9em; }
+    .stat-value { font-size: 1.8em; font-weight: bold; color: #58a6ff; }
+    .stat-label { color: #8b949e; font-size: 0.85em; }
+
+    /* --- Filters --- */
+    .filters {
+      background: #161b22;
+      border: 1px solid #30363d;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    .filters-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+    .filters-header h3 { color: #f0f6fc; font-size: 1em; }
+    .filters-reset {
+      background: none;
+      border: 1px solid #30363d;
+      color: #8b949e;
+      padding: 4px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.85em;
+    }
+    .filters-reset:hover { border-color: #58a6ff; color: #58a6ff; }
+    .filters-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 15px;
+    }
+    .filter-group label {
+      display: block;
+      color: #8b949e;
+      font-size: 0.8em;
+      margin-bottom: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .filter-group select,
+    .filter-group input {
+      width: 100%;
+      background: #0d1117;
+      border: 1px solid #30363d;
+      color: #c9d1d9;
+      padding: 8px 10px;
+      border-radius: 6px;
+      font-size: 0.9em;
+    }
+    .filter-group select:focus,
+    .filter-group input:focus {
+      outline: none;
+      border-color: #58a6ff;
+    }
+    .sort-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid #21262d;
+    }
+    .sort-btn {
+      background: #21262d;
+      border: 1px solid #30363d;
+      color: #8b949e;
+      padding: 6px 14px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 0.85em;
+      transition: all 0.2s;
+    }
+    .sort-btn:hover { border-color: #58a6ff; color: #58a6ff; }
+    .sort-btn.active { background: #388bfd; color: #fff; border-color: #388bfd; }
+    .results-count {
+      color: #8b949e;
+      font-size: 0.9em;
+      margin-bottom: 15px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .load-more {
+      display: block;
+      width: 100%;
+      max-width: 400px;
+      margin: 25px auto;
+      padding: 14px;
+      background: #21262d;
+      border: 1px solid #30363d;
+      color: #58a6ff;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1em;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+    .load-more:hover { background: #30363d; border-color: #58a6ff; }
+
+    /* --- Cards --- */
     .cards { 
       display: grid; 
       grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); 
@@ -180,9 +292,16 @@ export async function generateHTML(
       border-top: 1px solid #30363d; 
       color: #8b949e; 
     }
+    .no-results {
+      text-align: center;
+      padding: 60px 20px;
+      color: #8b949e;
+    }
+    .no-results h3 { color: #f0f6fc; margin-bottom: 10px; }
     @media (max-width: 600px) { 
       .cards { grid-template-columns: 1fr; } 
       .card-prices { flex-direction: column; gap: 10px; } 
+      .filters-grid { grid-template-columns: 1fr 1fr; }
     }
   </style>
 </head>
@@ -199,28 +318,280 @@ export async function generateHTML(
 
     <div class="stats">
       <div class="stat">
-        <div class="stat-value">${above40}</div>
-        <div class="stat-label">Acima de 40%</div>
+        <div class="stat-value">${totalProperties}</div>
+        <div class="stat-label">Total</div>
       </div>
       <div class="stat">
-        <div class="stat-value">${totalProperties}</div>
-        <div class="stat-label">Total Encontrados</div>
+        <div class="stat-value">${above40}</div>
+        <div class="stat-label">Desconto >40%</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value">${belowMarket}</div>
+        <div class="stat-label">Abaixo do Mercado</div>
       </div>
       <div class="stat">
         <div class="stat-value">${maxDiscount}%</div>
         <div class="stat-label">Maior Desconto</div>
       </div>
+      <div class="stat">
+        <div class="stat-value">${avgScore}</div>
+        <div class="stat-label">Score Médio</div>
+      </div>
     </div>
 
-    <div class="cards">
-${properties.slice(0, 20).map((p, idx) => generatePropertyCard(p, idx < 5)).join('\n')}
+    <div class="filters">
+      <div class="filters-header">
+        <h3>🔍 Filtros</h3>
+        <button class="filters-reset" onclick="resetFilters()">Limpar filtros</button>
+      </div>
+      <div class="filters-grid">
+        <div class="filter-group">
+          <label>Busca</label>
+          <input type="text" id="filterSearch" placeholder="Bairro, endereço..." oninput="applyFilters()">
+        </div>
+        <div class="filter-group">
+          <label>Tipo</label>
+          <select id="filterType" onchange="applyFilters()">
+            <option value="">Todos</option>
+            ${uniqueTypes.map(t => `<option value="${t}">${t}</option>`).join('\n            ')}
+          </select>
+        </div>
+        <div class="filter-group">
+          <label>Bairro</label>
+          <select id="filterNeighborhood" onchange="applyFilters()">
+            <option value="">Todos</option>
+            ${uniqueNeighborhoods.map(n => `<option value="${n}">${n}</option>`).join('\n            ')}
+          </select>
+        </div>
+        <div class="filter-group">
+          <label>Score mínimo</label>
+          <select id="filterScore" onchange="applyFilters()">
+            <option value="0">Todos</option>
+            <option value="30">30+</option>
+            <option value="50">50+ (bom)</option>
+            <option value="60">60+ (ótimo)</option>
+            <option value="70">70+ (excelente)</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label>Preço máx.</label>
+          <select id="filterMaxPrice" onchange="applyFilters()">
+            <option value="0">Sem limite</option>
+            <option value="200000">R$200k</option>
+            <option value="400000">R$400k</option>
+            <option value="600000">R$600k</option>
+            <option value="800000">R$800k</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label>Fonte</label>
+          <select id="filterSource" onchange="applyFilters()">
+            <option value="">Todas</option>
+            ${uniqueSources.map(s => `<option value="${s}">${s}</option>`).join('\n            ')}
+          </select>
+        </div>
+      </div>
+      <div class="sort-row">
+        <span style="color:#8b949e;font-size:0.85em;line-height:2;">Ordenar:</span>
+        <button class="sort-btn active" data-sort="score" onclick="setSort('score')">⭐ Score</button>
+        <button class="sort-btn" data-sort="price-asc" onclick="setSort('price-asc')">💰 Preço ↑</button>
+        <button class="sort-btn" data-sort="price-desc" onclick="setSort('price-desc')">💰 Preço ↓</button>
+        <button class="sort-btn" data-sort="discount" onclick="setSort('discount')">📉 Desconto</button>
+        <button class="sort-btn" data-sort="m2" onclick="setSort('m2')">📐 R$/m²</button>
+        <button class="sort-btn" data-sort="real-discount" onclick="setSort('real-discount')">🎯 Desc. Real</button>
+      </div>
     </div>
+
+    <div class="results-count" id="resultsCount"></div>
+    <div class="cards" id="cardsContainer"></div>
+    <button class="load-more" id="loadMore" onclick="loadMore()" style="display:none;">Mostrar mais</button>
 
     <footer>
-      <p>Fontes: ${getUniqueSources(properties).join(', ')} • Gerado automaticamente por 🐦 Avê</p>
-      <p style="margin-top: 10px; font-size: 0.85em;">Filtros: Curitiba + Grande Curitiba | Desconto >40% | Preço <R$800k</p>
+      <p>Fontes: ${uniqueSources.join(', ')} • Gerado automaticamente por 🐦 Avê</p>
+      <p style="margin-top: 10px; font-size: 0.85em;">Score = desconto nominal + desconto real vs mercado + vagas + bairro + ocupação + prazo</p>
     </footer>
   </div>
+
+  <script>
+    const ALL_PROPERTIES = ${JSON.stringify(properties.map(p => ({
+      id: p.id,
+      tipo: p.tipo,
+      bairro: p.bairro,
+      endereco: p.endereco,
+      lance: p.lance,
+      avaliacao: p.avaliacao,
+      desconto: p.desconto,
+      modalidade: p.modalidade,
+      encerramento: p.encerramento,
+      ocupacao: p.ocupacao,
+      area: p.area,
+      fonte: p.fonte,
+      link: p.link,
+      novo: p.novo,
+      prioridade: p.prioridade,
+      semVagas: p.semVagas,
+      alertas: p.alertas,
+      quartos: (p as any).quartos,
+      vagas: (p as any).vagas,
+      precoM2: (p as any).precoM2,
+      mediaM2Bairro: (p as any).mediaM2Bairro,
+      descontoReal: (p as any).descontoReal,
+      score: (p as any).score,
+    })))};
+
+    let currentSort = 'score';
+    let visibleCount = 24;
+    let filteredData = [];
+
+    function getTypeEmoji(tipo) {
+      const l = tipo.toLowerCase();
+      if (l.includes('apartamento')) return '🏢';
+      if (l.includes('casa') || l.includes('sobrado')) return '🏠';
+      if (l.includes('terreno')) return '🗺️';
+      if (l.includes('comercial') || l.includes('sala')) return '🏪';
+      return '🏘️';
+    }
+
+    function fmtCurrency(v) {
+      return 'R$' + v.toLocaleString('pt-BR', { minimumFractionDigits: 0 });
+    }
+
+    function fmtDate(d) {
+      if (!d) return '';
+      const dt = new Date(d);
+      return dt.toLocaleDateString('pt-BR');
+    }
+
+    function renderCard(p, isTop) {
+      const typeEmoji = getTypeEmoji(p.tipo);
+      const discountClass = p.desconto && p.desconto >= 60 ? 'hot' : '';
+      const classes = ['card', isTop ? 'top' : '', p.prioridade ? 'priority' : '', p.novo ? 'new' : ''].filter(Boolean).join(' ');
+
+      const scoreVal = p.score || 0;
+      const scoreClass = scoreVal >= 60 ? 'score-high' : scoreVal >= 40 ? 'score-mid' : 'score-low';
+      const scoreBadge = scoreVal > 0 ? '<span class="score-badge ' + scoreClass + '">' + scoreVal + '/100</span>' : '';
+
+      let m2Html = '';
+      if (p.precoM2) {
+        const m2Fmt = 'R$' + p.precoM2.toLocaleString('pt-BR') + '/m²';
+        let comp = '';
+        if (p.mediaM2Bairro && p.descontoReal !== undefined) {
+          const cls = p.descontoReal >= 0 ? 'm2-below' : 'm2-above';
+          const txt = p.descontoReal >= 0
+            ? p.descontoReal + '% abaixo (méd. R$' + p.mediaM2Bairro.toLocaleString('pt-BR') + '/m²)'
+            : Math.abs(p.descontoReal) + '% ACIMA (méd. R$' + p.mediaM2Bairro.toLocaleString('pt-BR') + '/m²)';
+          comp = '<span class="m2-comparison ' + cls + '">' + txt + '</span>';
+        }
+        m2Html = '<div class="m2-info"><span class="m2-value">' + m2Fmt + '</span>' + comp + '</div>';
+      }
+
+      const vagasTag = p.vagas !== undefined
+        ? (p.vagas > 0 ? '<span class="meta-tag">🅿️ ' + p.vagas + ' vaga' + (p.vagas > 1 ? 's' : '') + '</span>' : '<span class="meta-tag" style="background:#da3633;color:#fff">⛔ 0 vagas</span>')
+        : '';
+      const quartosTag = p.quartos ? '<span class="meta-tag">🛏️ ' + p.quartos + ' qto' + (p.quartos > 1 ? 's' : '') + '</span>' : '';
+      const alertTags = (p.alertas || []).filter(a => !a.includes('SEM VAGAS')).map(a => '<span class="meta-tag" style="background:#d29922;color:#000">' + a + '</span>').join('');
+
+      return '<div class="' + classes + '">' +
+        '<div class="card-header">' +
+          '<div class="card-title">' + scoreBadge + typeEmoji + ' ' + p.tipo + ' - ' + p.bairro + '</div>' +
+          (p.desconto ? '<div class="card-discount ' + discountClass + '">-' + p.desconto + '%</div>' : '') +
+        '</div>' +
+        '<div class="card-location">📍 ' + p.endereco + '</div>' +
+        '<div class="card-prices">' +
+          '<div class="price-item"><div class="price-label">' + p.modalidade + '</div><div class="price-value">' + fmtCurrency(p.lance) + '</div></div>' +
+          (p.avaliacao ? '<div class="price-item"><div class="price-label">Avaliação</div><div class="price-value original">' + fmtCurrency(p.avaliacao) + '</div></div>' : '') +
+        '</div>' +
+        m2Html +
+        '<div class="card-meta">' + quartosTag + vagasTag +
+          (p.area ? '<span class="meta-tag">' + p.area + '</span>' : '') +
+          (p.encerramento ? '<span class="meta-tag">Encerramento: ' + fmtDate(p.encerramento) + '</span>' : '') +
+          (p.ocupacao === 'ocupado' ? '<span class="meta-tag">⚠️ Ocupado</span>' : '') +
+          (p.ocupacao === 'desocupado' ? '<span class="meta-tag">✅ Desocupado</span>' : '') +
+          (p.semVagas ? '<span class="meta-tag" style="background:#da3633;color:#fff">⛔ SEM VAGAS</span>' : '') +
+          alertTags +
+        '</div>' +
+        '<a href="' + p.link + '" target="_blank" class="card-link">Ver no ' + p.fonte + ' →</a>' +
+      '</div>';
+    }
+
+    function sortData(data, sortKey) {
+      const sorted = [...data];
+      switch (sortKey) {
+        case 'score': sorted.sort((a, b) => (b.score || 0) - (a.score || 0)); break;
+        case 'price-asc': sorted.sort((a, b) => a.lance - b.lance); break;
+        case 'price-desc': sorted.sort((a, b) => b.lance - a.lance); break;
+        case 'discount': sorted.sort((a, b) => (b.desconto || 0) - (a.desconto || 0)); break;
+        case 'm2': sorted.sort((a, b) => (a.precoM2 || 99999) - (b.precoM2 || 99999)); break;
+        case 'real-discount': sorted.sort((a, b) => (b.descontoReal || -999) - (a.descontoReal || -999)); break;
+      }
+      return sorted;
+    }
+
+    function applyFilters() {
+      const search = document.getElementById('filterSearch').value.toLowerCase();
+      const type = document.getElementById('filterType').value;
+      const hood = document.getElementById('filterNeighborhood').value;
+      const minScore = parseInt(document.getElementById('filterScore').value) || 0;
+      const maxPrice = parseInt(document.getElementById('filterMaxPrice').value) || 0;
+      const source = document.getElementById('filterSource').value;
+
+      filteredData = ALL_PROPERTIES.filter(p => {
+        if (search && !(p.bairro.toLowerCase().includes(search) || p.endereco.toLowerCase().includes(search) || p.tipo.toLowerCase().includes(search))) return false;
+        if (type && p.tipo !== type) return false;
+        if (hood && p.bairro !== hood) return false;
+        if (minScore && (p.score || 0) < minScore) return false;
+        if (maxPrice && p.lance > maxPrice) return false;
+        if (source && p.fonte !== source) return false;
+        return true;
+      });
+
+      filteredData = sortData(filteredData, currentSort);
+      visibleCount = 24;
+      renderCards();
+    }
+
+    function renderCards() {
+      const container = document.getElementById('cardsContainer');
+      const showing = filteredData.slice(0, visibleCount);
+      container.innerHTML = showing.length > 0
+        ? showing.map((p, i) => renderCard(p, i < 3 && currentSort === 'score')).join('')
+        : '<div class="no-results"><h3>Nenhum imóvel encontrado</h3><p>Tente ajustar os filtros</p></div>';
+      
+      document.getElementById('resultsCount').innerHTML = 
+        '<span>Mostrando <strong>' + Math.min(visibleCount, filteredData.length) + '</strong> de <strong>' + filteredData.length + '</strong> imóveis</span>' +
+        '<span style="font-size:0.8em;">(' + ALL_PROPERTIES.length + ' total no banco)</span>';
+
+      const btn = document.getElementById('loadMore');
+      btn.style.display = visibleCount < filteredData.length ? 'block' : 'none';
+      btn.textContent = 'Mostrar mais (' + (filteredData.length - visibleCount) + ' restantes)';
+    }
+
+    function loadMore() {
+      visibleCount += 24;
+      renderCards();
+    }
+
+    function setSort(key) {
+      currentSort = key;
+      document.querySelectorAll('.sort-btn').forEach(b => b.classList.toggle('active', b.dataset.sort === key));
+      filteredData = sortData(filteredData, key);
+      visibleCount = 24;
+      renderCards();
+    }
+
+    function resetFilters() {
+      document.getElementById('filterSearch').value = '';
+      document.getElementById('filterType').value = '';
+      document.getElementById('filterNeighborhood').value = '';
+      document.getElementById('filterScore').value = '0';
+      document.getElementById('filterMaxPrice').value = '0';
+      document.getElementById('filterSource').value = '';
+      applyFilters();
+    }
+
+    // Initialize
+    applyFilters();
+  </script>
 </body>
 </html>`;
   
