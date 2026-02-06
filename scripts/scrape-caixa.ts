@@ -1,195 +1,153 @@
-import * as cheerio from 'cheerio';
+import { readFileSync, writeFileSync, existsSync } from 'fs';
+import { join, dirname } from 'path';
+import { fileURLToPath } from 'url';
 import type { Property } from './types.ts';
-import { log, parsePrice, parseBRDate, calculateDiscount, meetsFilters, isPriorityNeighborhood } from './utils.ts';
+import { log, isPriorityNeighborhood, normalizeText } from './utils.ts';
 
-const BASE_URL = 'https://venda-imoveis.caixa.gov.br';
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const DATA_DIR = join(__dirname, '..', 'data');
 
-/**
- * Scrape Caixa Econômica Federal auction listings
- */
-export async function scrapeCaixa(): Promise<Property[]> {
-  log('🔍 Starting Caixa scraper...');
-  
-  const properties: Property[] = [];
-  
-  // Caixa search URL for Paraná/Curitiba
-  const searchUrl = `${BASE_URL}/sistema/busca-imovel.asp`;
-  
-  // Cities to search
-  const cities = [
-    'CURITIBA',
-    'FAZENDA RIO GRANDE',
-    'PINHAIS',
-    'SAO JOSE DOS PINHAIS',
-    'COLOMBO',
-    'CAMPO LARGO',
-    'ARAUCARIA',
-    'ALMIRANTE TAMANDARE'
-  ];
-  
-  for (const city of cities) {
-    try {
-      // Build search query
-      const params = new URLSearchParams({
-        estado: 'PR',
-        cidade: city,
-      });
-      
-      const url = `${searchUrl}?${params.toString()}`;
-      log(`Fetching ${city}...`);
-      
-      const response = await fetch(url, {
-        headers: {
-          'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36'
-        }
-      });
-      
-      if (!response.ok) {
-        log(`Failed to fetch ${city}: ${response.status}`, 'warn');
-        continue;
-      }
-      
-      const html = await response.text();
-      const $ = cheerio.load(html);
-      
-      // Find property listings (adjust selectors based on actual Caixa page)
-      $('.imovel, .property, .item').each((_, element) => {
-        try {
-          const property = parseCaixaProperty($, element, city);
-          if (property && meetsFilters(property)) {
-            properties.push(property);
-          }
-        } catch (err) {
-          log(`Error parsing property: ${err}`, 'warn');
-        }
-      });
-      
-      // Rate limiting
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-    } catch (error) {
-      log(`Error scraping ${city}: ${error}`, 'error');
-    }
-  }
-  
-  log(`✅ Caixa: Found ${properties.length} properties matching filters`);
-  return properties;
+const CAIXA_CSV_URL = 'https://venda-imoveis.caixa.gov.br/listaweb/Lista_imoveis_PR.csv';
+
+const TARGET_CITIES = [
+  'CURITIBA', 'FAZENDA RIO GRANDE', 'SAO JOSE DOS PINHAIS', 'PINHAIS',
+  'COLOMBO', 'ARAUCARIA', 'CAMPO LARGO', 'ALMIRANTE TAMANDARE',
+];
+
+function titleCase(s: string): string {
+  return s.replace(/\w\S*/g, w => w.charAt(0).toUpperCase() + w.substr(1).toLowerCase());
+}
+
+function parseBRL(s: string): number {
+  const clean = s.replace(/[R$\s]/g, '').replace(/\./g, '').replace(',', '.');
+  const val = parseFloat(clean) || 0;
+  return Math.round(val * 100) / 100;
 }
 
 /**
- * Parse a single property from Caixa HTML
+ * Scrape Caixa Econômica Federal properties via CSV download
+ * 
+ * Strategy: Try direct CSV fetch first. Caixa has Radware bot protection,
+ * so fallback to a cached CSV file if the direct download is blocked.
  */
-function parseCaixaProperty($: cheerio.CheerioAPI, element: cheerio.Element, city: string): Property | null {
+export async function scrapeCaixa(): Promise<Property[]> {
+  log('🏦 Starting Caixa Econômica scraper...');
+
+  let csvText = '';
+
+  // Try direct fetch
   try {
-    const $el = $(element);
-    
-    // Extract link
-    const link = $el.find('a').first().attr('href') || '';
-    const fullLink = link.startsWith('http') ? link : `${BASE_URL}${link}`;
-    
-    // Extract ID from URL or data attribute
-    const idMatch = fullLink.match(/imovel[=_-](\d+)/i) || 
-                    $el.attr('data-id')?.match(/(\d+)/);
-    if (!idMatch) return null;
-    const id = `caixa-${idMatch[1]}`;
-    
-    // Get property type
-    let tipo = $el.find('.tipo, .tipo-imovel').text().trim();
-    if (!tipo) {
-      const desc = $el.text().toLowerCase();
-      if (desc.includes('apartamento')) tipo = 'Apartamento';
-      else if (desc.includes('casa')) tipo = 'Casa';
-      else if (desc.includes('sobrado')) tipo = 'Sobrado';
-      else if (desc.includes('terreno')) tipo = 'Terreno';
-      else if (desc.includes('comercial') || desc.includes('sala')) tipo = 'Comercial';
-      else tipo = 'Imóvel';
+    log('Attempting direct CSV download...');
+    const resp = await fetch(CAIXA_CSV_URL, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'Accept': 'text/csv,text/html,application/xhtml+xml,*/*',
+        'Accept-Language': 'pt-BR,pt;q=0.9',
+        'Referer': 'https://venda-imoveis.caixa.gov.br/sistema/download-lista.asp',
+      },
+    });
+
+    const text = await resp.text();
+
+    // Check if we got actual CSV or a CAPTCHA page
+    if (text.includes('Nº do imóvel') || text.includes('N\u00ba do im\u00f3vel') || text.includes('Lista de Im')) {
+      csvText = text;
+      log('✅ Direct download succeeded!');
+    } else {
+      log('Got CAPTCHA/bot protection instead of CSV', 'warn');
     }
-    
-    // Get address
-    let endereco = $el.find('.endereco, .address').text().trim();
-    if (!endereco) {
-      // Try to extract from description
-      const descText = $el.find('.descricao, .description').text();
-      const addressMatch = descText.match(/(?:Rua|Av|Avenida|R\.)\s+[^,]+/i);
-      endereco = addressMatch ? addressMatch[0] : '';
-    }
-    if (!endereco) return null;
-    
-    // Extract bairro
-    let bairro = $el.find('.bairro, .neighborhood').text().trim();
-    if (!bairro) {
-      // Try to extract from address
-      const parts = endereco.split(/[-,]/);
-      if (parts.length > 1) {
-        bairro = parts[1].trim();
-      } else {
-        bairro = city;
-      }
-    }
-    
-    // Get prices
-    const lanceStr = $el.find('.valor, .preco, .price').first().text();
-    const lance = parsePrice(lanceStr);
-    if (!lance) return null;
-    
-    // Caixa typically shows "De: R$ X Por: R$ Y"
-    const avaliacaoStr = $el.find('.valor-original, .de').first().text() ||
-                         $el.text().match(/De:\s*R\$\s*[\d.,]+/i)?.[0];
-    const avaliacao = avaliacaoStr ? parsePrice(avaliacaoStr) : null;
-    
-    // Calculate discount
-    const desconto = avaliacao && lance ? calculateDiscount(avaliacao, lance) : null;
-    
-    // Get sale type
-    let modalidade = $el.find('.modalidade, .tipo-venda').text().trim();
-    if (!modalidade) {
-      const text = $el.text();
-      if (text.includes('Venda Online')) modalidade = 'Venda Online Caixa';
-      else if (text.includes('Compra Direta')) modalidade = 'Compra Direta Caixa';
-      else modalidade = 'Leilão Caixa';
-    }
-    
-    // Get closing date
-    const dataStr = $el.find('.data, .date, .encerramento').text();
-    const encerramento = parseBRDate(dataStr);
-    
-    // Get area
-    const areaMatch = $el.text().match(/(\d+(?:,\d+)?)\s*m[²2]/i);
-    const area = areaMatch ? `${areaMatch[1]}m²` : undefined;
-    
-    // Occupancy
-    const obs = $el.text().toLowerCase();
-    let ocupacao = 'desconhecido';
-    if (obs.includes('ocupado')) ocupacao = 'ocupado';
-    else if (obs.includes('desocupado') || obs.includes('livre')) ocupacao = 'desocupado';
-    
-    const property: Property = {
-      id,
-      tipo,
-      bairro,
-      endereco,
-      lance,
-      avaliacao,
-      desconto,
-      modalidade,
-      encerramento,
-      ocupacao,
-      area,
-      fonte: 'Caixa',
-      link: fullLink,
-      prioridade: isPriorityNeighborhood(bairro)
-    };
-    
-    return property;
-    
-  } catch (error) {
-    log(`Error parsing Caixa property: ${error}`, 'warn');
-    return null;
+  } catch (e: any) {
+    log(`Direct download failed: ${e.message}`, 'warn');
   }
+
+  // Fallback: cached CSV
+  const cacheFile = join(DATA_DIR, 'caixa_pr_cache.csv');
+  if (!csvText && existsSync(cacheFile)) {
+    log('📂 Using cached Caixa CSV...');
+    csvText = readFileSync(cacheFile, 'latin1');
+  }
+
+  if (!csvText) {
+    log('❌ No Caixa data available (bot protection + no cache)', 'error');
+    log('To populate cache, manually download from: https://venda-imoveis.caixa.gov.br/sistema/download-lista.asp');
+    return [];
+  }
+
+  // Save/update cache
+  writeFileSync(cacheFile, csvText, 'latin1');
+
+  // Parse CSV
+  // Format: N° do imóvel;UF;Cidade;Bairro;Endereço;Preço;Valor de avaliação;Desconto;Descrição;Modalidade de venda;Link de acesso
+  const lines = csvText.split('\n').filter(l => l.trim());
+  const properties: Property[] = [];
+
+  for (const line of lines) {
+    // Skip header and metadata lines
+    if (line.includes('Lista de Im') || line.includes('Nº do im') || line.includes('N\u00ba do')) continue;
+
+    const fields = line.split(';').map(f => f.trim());
+    if (fields.length < 11) continue;
+
+    const [id, uf, cidade, bairro, endereco, precoStr, avaliacaoStr, descontoStr, descricao, modalidade, link] = fields;
+
+    // Filter by target cities
+    const cidadeNorm = cidade.toUpperCase().trim();
+    if (!TARGET_CITIES.includes(cidadeNorm)) continue;
+
+    const preco = parseBRL(precoStr);
+    const avaliacao = parseBRL(avaliacaoStr);
+    const desconto = parseFloat(descontoStr) || 0;
+
+    if (preco === 0) continue;
+
+    // Extract tipo from description
+    let tipo = 'Imóvel';
+    const tipoMatch = descricao.match(/^(Apartamento|Casa|Sobrado|Terreno|Sala|Gleba|Loja|Galpão|Prédio)/i);
+    if (tipoMatch) tipo = titleCase(tipoMatch[1]);
+
+    // Extract area from description
+    let area = '';
+    const areaPriv = descricao.match(/([\d.,]+) de área privativa/);
+    const areaTotal = descricao.match(/([\d.,]+) de área total/);
+    const areaTerreno = descricao.match(/([\d.,]+) de área do terreno/);
+    if (areaPriv && parseFloat(areaPriv[1]) > 0) {
+      area = `${areaPriv[1]}m²`;
+    } else if (areaTotal && parseFloat(areaTotal[1]) > 0) {
+      area = `${areaTotal[1]}m²`;
+    }
+    if (areaTerreno && parseFloat(areaTerreno[1]) > 0) {
+      area += area ? ` (terreno: ${areaTerreno[1]}m²)` : `terreno: ${areaTerreno[1]}m²`;
+    }
+
+    // Normalize bairro
+    const bairroDisplay = titleCase(bairro.toLowerCase());
+    const bairroFinal = cidadeNorm === 'CURITIBA' ? bairroDisplay : `${bairroDisplay} (${titleCase(cidade.toLowerCase())})`;
+
+    properties.push({
+      id: `caixa-${id.trim()}`,
+      tipo,
+      bairro: bairroFinal,
+      endereco,
+      lance: preco,
+      avaliacao: avaliacao > 0 ? avaliacao : preco,
+      desconto: Math.round(desconto * 100) / 100,
+      modalidade: modalidade || 'Caixa',
+      encerramento: null,
+      ocupacao: 'desconhecido',
+      area: area || undefined,
+      fonte: 'Caixa Econômica',
+      link: link || '',
+      prioridade: isPriorityNeighborhood(bairro),
+    });
+  }
+
+  log(`✅ Caixa: ${properties.length} properties parsed from CSV`);
+  return properties;
 }
 
 // Run standalone
 if (import.meta.main) {
   const properties = await scrapeCaixa();
   console.log(JSON.stringify(properties, null, 2));
+  console.log(`\nTotal: ${properties.length} properties`);
 }
