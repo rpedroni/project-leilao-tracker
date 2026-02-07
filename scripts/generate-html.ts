@@ -595,7 +595,8 @@ export async function generateHTML(
 </body>
 </html>`;
   
-  await Bun.write(outputPath, html);
+  const fs = await import('fs');
+  fs.writeFileSync(outputPath, html);
   log(`✅ HTML generated successfully`);
 }
 
@@ -729,7 +730,8 @@ if (import.meta.main) {
   const [inputFile, outputFile] = args;
   
   try {
-    const properties = await Bun.file(inputFile).json();
+    const fs = await import('fs');
+    const properties = JSON.parse(fs.readFileSync(inputFile, 'utf-8'));
     await generateHTML(properties, outputFile, outputFile.includes('index.html'));
   } catch (error) {
     log(`Error: ${error}`, 'error');
