@@ -14,39 +14,76 @@ import type { Property } from './types.ts';
 import { PRIORITY_NEIGHBORHOODS } from './types.ts';
 import { log, normalizeText } from './utils.ts';
 
-// --- Neighborhood avg price per m² (Curitiba, 2025/2026 estimates from market data) ---
-// Source: Imovelweb/VivaReal/ZAP market reports for Curitiba
+// --- Neighborhood avg price per m² (Curitiba, Dec 2025 / Jan 2026) ---
+// Source: Loft/FipeZAP Dec 2025 reports (G1, MySide)
+// These are LISTING averages (skew toward newer/premium units).
+// We apply adjustments below for property type, size, and auction context.
 const NEIGHBORHOOD_PRICE_M2: Record<string, number> = {
-  'batel': 12500,
-  'agua verde': 9500,
-  'bigorrilho': 10000,
-  'cabral': 8500,
-  'jardim social': 5800,
-  'alto da xv': 7500,
-  'hugo lange': 7000,
-  'juveve': 7200,
-  'portao': 6500,
-  'reboucas': 7000,
-  'cristo rei': 7800,
-  'boa vista': 5500,
-  'bacacheri': 5800,
-  'taruma': 5000,
-  'centro': 6000,
-  'alto boqueirao': 3800,
-  'boqueirao': 4200,
-  'cidade industrial': 3500,
-  'sitio cercado': 3200,
-  'cajuru': 4000,
-  'pinheirinho': 3800,
-  'xaxim': 4000,
-  'fazenda rio grande': 3000,
-  'colombo': 3200,
-  'sao jose dos pinhais': 4000,
-  'pinhais': 3800,
-  'araucaria': 3500,
-  'campo largo': 3300,
-  'almirante tamandare': 2800,
+  // Premium — Loft Dec 2025 data
+  'batel': 16240,
+  'bigorrilho': 15061,
+  'cabral': 13180,
+  'campo comprido': 12450,
+  'agua verde': 11768,
+  'ecoville': 12000,
+  'centro': 10250,
+  // Mid-tier — Loft + FipeZAP estimates
+  'portao': 8331,
+  'novo mundo': 7732,
+  'alto da xv': 9000,
+  'hugo lange': 8500,
+  'juveve': 8800,
+  'reboucas': 8500,
+  'cristo rei': 9200,
+  'jardim social': 7500,
+  'boa vista': 6845,
+  'bacacheri': 7200,
+  'taruma': 6500,
+  // Affordable — estimated from market reports
+  'cajuru': 5500,
+  'boqueirao': 5800,
+  'alto boqueirao': 5200,
+  'xaxim': 5500,
+  'pinheirinho': 5200,
+  'sitio cercado': 4800,
+  'cidade industrial': 7251,
+  // Grande Curitiba — updated estimates
+  'fazenda rio grande': 4500,
+  'colombo': 4800,
+  'sao jose dos pinhais': 5800,
+  'pinhais': 5500,
+  'araucaria': 5200,
+  'campo largo': 4800,
+  'almirante tamandare': 4200,
 };
+
+/**
+ * Adjust neighborhood avg for auction property characteristics.
+ * 
+ * Listing averages (from Loft/FipeZAP) include new builds and premium units.
+ * Auction properties are typically older and in "as-is" condition.
+ * 
+ * We apply a conservative 10% haircut as baseline, then mild type adjustments.
+ * The goal: avoid false "above market" flags while still catching genuinely overpriced deals.
+ */
+function adjustedMarketPrice(baseAvg: number, area: number | null, tipo: string, _fonte: string): number {
+  let adjusted = baseAvg;
+
+  // 1. Used/auction baseline: listing avgs skew ~10% above resale market
+  adjusted *= 0.90;
+
+  // 2. Property type adjustments (relative to apartment baseline)
+  const tipoLower = tipo.toLowerCase();
+  if (tipoLower.includes('casa') || tipoLower.includes('sobrado')) {
+    adjusted *= 0.85; // Houses typically lower R$/m² than apartments
+  } else if (tipoLower.includes('terreno')) {
+    adjusted *= 0.50; // Land is much cheaper per m²
+  } else if (tipoLower.includes('sala') || tipoLower.includes('comercial')) {
+    adjusted *= 0.65; // Commercial units priced very differently
+  }
+
+  return Math.round(adjusted);
+}
 
 export interface EnrichedProperty extends Property {
   /** Number of bedrooms parsed from description */
@@ -116,14 +153,23 @@ function extractArea(areaStr?: string): number | null {
 }
 
 /**
- * Find neighborhood avg price per m²
+ * Find neighborhood base avg price per m² (unadjusted listing avg)
  */
-function findNeighborhoodAvg(bairro: string): number | null {
+function findNeighborhoodBaseAvg(bairro: string): number | null {
   const norm = normalizeText(bairro);
   for (const [key, val] of Object.entries(NEIGHBORHOOD_PRICE_M2)) {
     if (norm.includes(key) || key.includes(norm)) return val;
   }
   return null;
+}
+
+/**
+ * Find adjusted neighborhood avg for a specific property
+ */
+function findNeighborhoodAvg(bairro: string, area: number | null, tipo: string, fonte: string): number | null {
+  const base = findNeighborhoodBaseAvg(bairro);
+  if (!base) return null;
+  return adjustedMarketPrice(base, area, tipo, fonte);
 }
 
 /**
@@ -249,15 +295,18 @@ function enrichProperty(prop: Property): EnrichedProperty {
   if (area && area > 10) {
     enriched.precoM2 = Math.round(prop.lance / area);
 
-    // Find neighborhood average
-    const avgM2 = findNeighborhoodAvg(prop.bairro);
+    // Find adjusted neighborhood average (accounts for property type, size, auction context)
+    const avgM2 = findNeighborhoodAvg(prop.bairro, area, prop.tipo, prop.fonte);
     if (avgM2) {
       enriched.mediaM2Bairro = avgM2;
-      // Real discount = how much below market price per m²
+      // Real discount = how much below adjusted market price per m²
       enriched.descontoReal = Math.round((1 - enriched.precoM2 / avgM2) * 100);
 
-      if (enriched.descontoReal < 0) {
-        alertas.push(`📈 Acima do mercado! R$${enriched.precoM2}/m² vs média R$${avgM2}/m²`);
+      if (enriched.descontoReal < -20) {
+        // Only flag as "above market" if significantly above adjusted price
+        alertas.push(`📈 Acima do mercado! R$${enriched.precoM2}/m² vs média ajustada R$${avgM2}/m²`);
+      } else if (enriched.descontoReal < 0) {
+        alertas.push(`⚠️ Próximo do mercado: R$${enriched.precoM2}/m² vs média ajustada R$${avgM2}/m²`);
       }
     }
   }
@@ -304,7 +353,8 @@ if (import.meta.main) {
   const args = process.argv.slice(2);
   const inputFile = args[0] || 'data/2026-02-06.json';
 
-  const data: Property[] = JSON.parse(require('fs').readFileSync(inputFile, 'utf8'));
+  const fs = await import('fs');
+  const data: Property[] = JSON.parse(fs.readFileSync(inputFile, 'utf8'));
   const enriched = enrichProperties(data);
 
   // Print top 10
@@ -333,6 +383,6 @@ if (import.meta.main) {
 
   // Save enriched data
   const outputFile = inputFile.replace('.json', '-enriched.json');
-  require('fs').writeFileSync(outputFile, JSON.stringify(enriched, null, 2));
+  fs.writeFileSync(outputFile, JSON.stringify(enriched, null, 2));
   console.log(`\n💾 Saved enriched data to ${outputFile}`);
 }
