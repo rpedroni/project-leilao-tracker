@@ -13,16 +13,17 @@ from datetime import datetime, timedelta
 DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'data')
 ROOT_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..')
 
+# Group-approved priority neighborhoods (Investment/Flipping WhatsApp group)
 PRIORITY_NEIGHBORHOODS = [
-    'Portão', 'Batel', 'Água Verde', 'Centro', 'Bigorrilho',
-    'Cabral', 'Jardim Social', 'Alto da XV', 'Hugo Lange',
-    'Juvevê', 'Rebouças', 'Cristo Rei', 'Boa Vista', 'Bacacheri', 'Tarumã'
+    'Portão', 'Batel', 'Cabral', 'Mercês', 'Tarumã',
+    'Jardim das Américas', 'Jardim Social', 'Centro'
 ]
 
 NEIGHBORHOOD_PRICE_M2 = {
     'batel': 16240, 'bigorrilho': 15061, 'cabral': 13180,
     'campo comprido': 12450, 'agua verde': 11768, 'ecoville': 12000,
-    'centro': 10250, 'portao': 8331, 'novo mundo': 7732,
+    'centro': 10250, 'portao': 8331, 'merces': 9800, 'novo mundo': 7732,
+    'jardim das americas': 5800,
     'alto da xv': 9000, 'hugo lange': 8500, 'juveve': 8800,
     'reboucas': 8500, 'cristo rei': 9200, 'jardim social': 7500,
     'boa vista': 6845, 'bacacheri': 7200, 'taruma': 6500,

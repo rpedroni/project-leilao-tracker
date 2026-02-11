@@ -29,7 +29,9 @@ const NEIGHBORHOOD_PRICE_M2: Record<string, number> = {
   'centro': 10250,
   // Mid-tier — Loft + FipeZAP estimates
   'portao': 8331,
+  'merces': 9800,
   'novo mundo': 7732,
+  'jardim das americas': 5800,
   'alto da xv': 9000,
   'hugo lange': 8500,
   'juveve': 8800,

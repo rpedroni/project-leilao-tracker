@@ -36,10 +36,17 @@ export interface Property {
   scoreBreakdown?: string;
 }
 
+// Group-approved neighborhoods (Investment/Flipping WhatsApp group rules)
+// These are the ONLY neighborhoods that appear in daily reports
 export const PRIORITY_NEIGHBORHOODS = [
-  'Portão', 'Batel', 'Água Verde', 'Centro', 'Bigorrilho', 
-  'Cabral', 'Jardim Social', 'Alto da XV', 'Hugo Lange', 
-  'Juvevê', 'Rebouças', 'Cristo Rei', 'Boa Vista', 'Bacacheri', 'Tarumã'
+  'Portão', 'Batel', 'Cabral', 'Mercês', 'Tarumã',
+  'Jardim das Américas', 'Jardim Social', 'Centro'
+];
+
+// Extended neighborhoods — still tracked but lower priority (not in daily report)
+export const EXTENDED_NEIGHBORHOODS = [
+  'Água Verde', 'Bigorrilho', 'Alto da XV', 'Hugo Lange',
+  'Juvevê', 'Rebouças', 'Cristo Rei', 'Boa Vista', 'Bacacheri'
 ];
 
 export const GRANDE_CURITIBA = [

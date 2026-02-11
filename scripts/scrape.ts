@@ -22,10 +22,10 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const PROJECT_ROOT = join(__dirname, "..");
 const DATA_DIR = join(PROJECT_ROOT, "data");
 
+// Group-approved priority neighborhoods (Investment/Flipping WhatsApp group)
 const PRIORITY_BAIRROS = [
-  "Água Verde", "Batel", "Bigorrilho", "Centro", "Portão", "Rebouças",
-  "Alto da XV", "Cristo Rei", "Jardim Social", "Juvevê", "Hugo Lange",
-  "Cabral", "Boa Vista", "Bacacheri", "Tarumã",
+  "Portão", "Batel", "Cabral", "Mercês", "Tarumã",
+  "Jardim das Américas", "Jardim Social", "Centro",
 ];
 
 // Normalized versions for case-insensitive matching

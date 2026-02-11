@@ -8,10 +8,10 @@ import os
 
 DATA_DIR = os.path.join(os.path.dirname(__file__), '..', 'data')
 
+# Group-approved priority neighborhoods (Investment/Flipping WhatsApp group)
 PRIORITY_NEIGHBORHOODS = [
-    'Portão', 'Batel', 'Água Verde', 'Centro', 'Bigorrilho',
-    'Cabral', 'Jardim Social', 'Alto da XV', 'Hugo Lange',
-    'Juvevê', 'Rebouças', 'Cristo Rei', 'Boa Vista', 'Bacacheri', 'Tarumã'
+    'Portão', 'Batel', 'Cabral', 'Mercês', 'Tarumã',
+    'Jardim das Américas', 'Jardim Social', 'Centro'
 ]
 
 def normalize(s):
