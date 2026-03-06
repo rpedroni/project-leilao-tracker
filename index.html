@@ -313,7 +313,10 @@
     <div class="filters">
       <div class="filters-header">
         <h3>🔍 Filtros</h3>
-        <button class="filters-reset" onclick="resetFilters()">Limpar filtros</button>
+        <div style="display: flex; gap: 8px;">
+          <button class="filters-reset" onclick="exportToCSV()">📊 Exportar CSV</button>
+          <button class="filters-reset" onclick="resetFilters()">Limpar filtros</button>
+        </div>
       </div>
       <div class="filters-grid">
         <div class="filter-group">
@@ -609,6 +612,58 @@
       filteredData = sortData(filteredData, key);
       visibleCount = 24;
       renderCards();
+    }
+
+    function exportToCSV() {
+      if (filteredData.length === 0) {
+        alert('Nenhum imóvel para exportar. Ajuste os filtros primeiro.');
+        return;
+      }
+
+      // CSV Headers
+      const headers = [
+        'Bairro', 'Tipo', 'Endereço', 'Score', 'Desconto', 
+        'Preço Avaliação (R$)', 'Preço Leilão (R$)', 'Área (m²)', 'R$/m²',
+        'Comparação Mercado', 'Leilão', 'Data', 'Link'
+      ];
+
+      // Convert data to CSV rows
+      const rows = filteredData.map(p => [
+        p.neighborhood || '',
+        p.type || '',
+        p.address || '',
+        p.score || 0,
+        p.discount ? `${p.discount}%` : '',
+        p.avalPrice || '',
+        p.lancePrice || p.avalPrice || '',
+        p.area || '',
+        p.pricePerM2 || '',
+        p.marketComparison || '',
+        p.leilao || '',
+        p.date || '',
+        p.link || ''
+      ]);
+
+      // Combine headers + rows
+      const csvContent = [
+        headers.join(','),
+        ...rows.map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(','))
+      ].join('\n');
+
+      // Create downloadable file
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      const url = URL.createObjectURL(blob);
+      const timestamp = new Date().toISOString().slice(0, 10);
+      
+      link.setAttribute('href', url);
+      link.setAttribute('download', `leilao-tracker-${timestamp}.csv`);
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      console.log(`✅ Exported ${filteredData.length} properties to CSV`);
     }
 
     function resetFilters() {
