@@ -38,8 +38,9 @@ export interface Property {
 
 // Group-approved neighborhoods (Investment/Flipping WhatsApp group rules)
 // These are the ONLY neighborhoods that appear in daily reports
+// Last updated: 2026-02-11 (Portão removed per Débora's request)
 export const PRIORITY_NEIGHBORHOODS = [
-  'Portão', 'Batel', 'Cabral', 'Mercês', 'Tarumã',
+  'Batel', 'Cabral', 'Mercês', 'Tarumã',
   'Jardim das Américas', 'Jardim Social', 'Centro'
 ];
 

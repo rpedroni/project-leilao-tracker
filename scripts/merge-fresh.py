@@ -10,7 +10,7 @@ DATA_DIR = os.path.join(os.path.dirname(__file__), '..', 'data')
 
 # Group-approved priority neighborhoods (Investment/Flipping WhatsApp group)
 PRIORITY_NEIGHBORHOODS = [
-    'Portão', 'Batel', 'Cabral', 'Mercês', 'Tarumã',
+    'Batel', 'Cabral', 'Mercês', 'Tarumã',
     'Jardim das Américas', 'Jardim Social', 'Centro'
 ]
 
