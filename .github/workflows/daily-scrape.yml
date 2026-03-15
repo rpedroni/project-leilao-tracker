@@ -25,15 +25,15 @@ jobs:
       - name: Install dependencies
         run: bun install
       
-      - name: Run daily scraper
-        run: bun run scripts/run-daily.ts
-        env:
-          TZ: America/Sao_Paulo
-      
       - name: Configure git
         run: |
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+      
+      - name: Run daily scraper
+        run: bun run scripts/run-daily.ts
+        env:
+          TZ: America/Sao_Paulo
       
       # Git commit + push is handled by run-daily.ts
       # This step only runs if the script didn't push (fallback)
