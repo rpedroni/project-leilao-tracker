@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Leilão Tracker - 31/10/2026</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { 
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
+      background: #0d1117; 
+      color: #c9d1d9; 
+      line-height: 1.6; 
+    }
+    .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+    header { 
+      text-align: center; 
+      padding: 30px 0; 
+      border-bottom: 1px solid #30363d; 
+      margin-bottom: 20px; 
+    }
+    header h1 { color: #58a6ff; font-size: 2em; margin-bottom: 10px; }
+    header p { color: #8b949e; }
+    nav { 
+      display: flex; 
+      gap: 15px; 
+      justify-content: center; 
+      flex-wrap: wrap; 
+      margin-top: 15px; 
+    }
+    nav a { 
+      color: #58a6ff; 
+      text-decoration: none; 
+      padding: 5px 10px; 
+      border-radius: 6px; 
+      background: #21262d; 
+    }
+    nav a:hover, nav a.active { background: #388bfd; color: #fff; }
+
+    /* --- Stats --- */
+    .stats { 
+      display: grid; 
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); 
+      gap: 12px; 
+      margin-bottom: 20px; 
+    }
+    .stat { 
+      background: #161b22; 
+      padding: 16px; 
+      border-radius: 8px; 
+      text-align: center; 
+      border: 1px solid #30363d; 
+    }
+    .stat-value { font-size: 1.8em; font-weight: bold; color: #58a6ff; }
+    .stat-label { color: #8b949e; font-size: 0.85em; }
+
+    /* --- Filters --- */
+    .filters {
+      background: #161b22;
+      border: 1px solid #30363d;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    .filters-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+    .filters-header h3 { color: #f0f6fc; font-size: 1em; }
+    .filters-reset {
+      background: none;
+      border: 1px solid #30363d;
+      color: #8b949e;
+      padding: 4px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.85em;
+    }
+    .filters-reset:hover { border-color: #58a6ff; color: #58a6ff; }
+    .filters-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 15px;
+    }
+    .filter-group label {
+      display: block;
+      color: #8b949e;
+      font-size: 0.8em;
+      margin-bottom: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .filter-group select,
+    .filter-group input {
+      width: 100%;
+      background: #0d1117;
+      border: 1px solid #30363d;
+      color: #c9d1d9;
+      padding: 8px 10px;
+      border-radius: 6px;
+      font-size: 0.9em;
+    }
+    .filter-group select:focus,
+    .filter-group input:focus {
+      outline: none;
+      border-color: #58a6ff;
+    }
+    .sort-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid #21262d;
+    }
+    .sort-btn {
+      background: #21262d;
+      border: 1px solid #30363d;
+      color: #8b949e;
+      padding: 6px 14px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 0.85em;
+      transition: all 0.2s;
+    }
+    .sort-btn:hover { border-color: #58a6ff; color: #58a6ff; }
+    .sort-btn.active { background: #388bfd; color: #fff; border-color: #388bfd; }
+    .results-count {
+      color: #8b949e;
+      font-size: 0.9em;
+      margin-bottom: 15px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .load-more {
+      display: block;
+      width: 100%;
+      max-width: 400px;
+      margin: 25px auto;
+      padding: 14px;
+      background: #21262d;
+      border: 1px solid #30363d;
+      color: #58a6ff;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1em;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+    .load-more:hover { background: #30363d; border-color: #58a6ff; }
+
+    /* --- Cards --- */
+    .cards { 
+      display: grid; 
+      grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); 
+      gap: 20px; 
+    }
+    .card { 
+      background: #161b22; 
+      border-radius: 12px; 
+      padding: 20px; 
+      border: 1px solid #30363d; 
+      transition: transform 0.2s, border-color 0.2s;
+      position: relative;
+    }
+    .card:hover { transform: translateY(-2px); border-color: #58a6ff; }
+    .card.priority { border-left: 4px solid #f0883e; }
+    .card.top { border-left: 4px solid #238636; }
+    .card.new::before {
+      content: '✨ NOVO';
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: #238636;
+      color: #fff;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 0.7em;
+      font-weight: bold;
+    }
+    .score-badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-weight: bold;
+      font-size: 0.8em;
+      margin-right: 8px;
+    }
+    .score-high { background: #238636; color: #fff; }
+    .score-mid { background: #d29922; color: #000; }
+    .score-low { background: #da3633; color: #fff; }
+    .m2-info {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 8px 0;
+      font-size: 0.85em;
+      color: #8b949e;
+    }
+    .m2-value { color: #58a6ff; font-weight: bold; }
+    .m2-comparison { font-size: 0.8em; }
+    .m2-below { color: #7ee787; }
+    .m2-above { color: #f85149; }
+    .card-header { 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: flex-start; 
+      margin-bottom: 15px; 
+    }
+    .card-title { font-size: 1.1em; color: #f0f6fc; }
+    .card-discount { 
+      background: #238636; 
+      color: #fff; 
+      padding: 5px 12px; 
+      border-radius: 20px; 
+      font-weight: bold; 
+      font-size: 0.9em; 
+    }
+    .card-discount.hot { background: #da3633; }
+    .card-location { color: #8b949e; font-size: 0.9em; margin-bottom: 10px; }
+    .card-prices { display: flex; gap: 20px; margin: 15px 0; }
+    .price-item { }
+    .price-label { color: #8b949e; font-size: 0.8em; }
+    .price-value { font-size: 1.2em; font-weight: bold; color: #7ee787; }
+    .price-value.original { 
+      color: #f85149; 
+      text-decoration: line-through; 
+      font-size: 1em; 
+    }
+    .card-meta { display: flex; flex-wrap: wrap; gap: 10px; margin: 15px 0; }
+    .meta-tag { 
+      background: #21262d; 
+      padding: 4px 10px; 
+      border-radius: 4px; 
+      font-size: 0.85em; 
+      color: #8b949e; 
+    }
+    .card-link { 
+      display: block; 
+      text-align: center; 
+      background: #21262d; 
+      color: #58a6ff; 
+      padding: 12px; 
+      border-radius: 8px; 
+      text-decoration: none; 
+      font-weight: 500; 
+      transition: background 0.2s; 
+    }
+    .card-link:hover { background: #30363d; }
+    footer { 
+      text-align: center; 
+      padding: 30px 0; 
+      margin-top: 30px; 
+      border-top: 1px solid #30363d; 
+      color: #8b949e; 
+    }
+    .no-results {
+      text-align: center;
+      padding: 60px 20px;
+      color: #8b949e;
+    }
+    .no-results h3 { color: #f0f6fc; margin-bottom: 10px; }
+    @media (max-width: 600px) { 
+      .cards { grid-template-columns: 1fr; } 
+      .card-prices { flex-direction: column; gap: 10px; } 
+      .filters-grid { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>🏠 Leilão Tracker</h1>
+      <p>Oportunidades imobiliárias em Curitiba e região • 31/10/2026</p>
+      <nav>
+        <a href="index.html" class="">Atual</a>
+        <a href="2026-10-31.html">31/10</a>
+        <a href="2026-10-30.html">30/10</a>
+        <a href="2026-10-29.html">29/10</a>
+        <a href="2026-10-28.html">28/10</a>
+        <a href="2026-10-27.html">27/10</a>
+        <a href="2026-10-26.html">26/10</a>
+        <a href="2026-10-25.html">25/10</a>
+      </nav>
+    </header>
+
+    <div class="stats">
+      <div class="stat">
+        <div class="stat-value">126</div>
+        <div class="stat-label">Total</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value">26</div>
+        <div class="stat-label">Desconto >40%</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value">0</div>
+        <div class="stat-label">Abaixo do Mercado</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value">76.13%</div>
+        <div class="stat-label">Maior Desconto</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value">42</div>
+        <div class="stat-label">Score Médio</div>
+      </div>
+    </div>
+
+    <div class="filters">
+      <div class="filters-header">
+        <h3>🔍 Filtros</h3>
+        <button class="filters-reset" onclick="resetFilters()">Limpar filtros</button>
+      </div>
+      <div class="filters-grid">
+        <div class="filter-group">
+          <label>Busca</label>
+          <input type="text" id="filterSearch" placeholder="Bairro, endereço..." oninput="applyFilters()">
+        </div>
+        <div class="filter-group">
+          <label>Tipo</label>
+          <select id="filterType" onchange="applyFilters()">
+            <option value="">Todos</option>
+            <option value="Casa">Casa</option>
+            <option value="Imóvel">Imóvel</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label>Bairro</label>
+          <select id="filterNeighborhood" onchange="applyFilters()">
+            <option value="">Todos</option>
+            <option value="Academia (Sao Jose Dos Pinhais)">Academia (Sao Jose Dos Pinhais)</option>
+            <option value="Afonso Pena (Sao Jose Dos Pinhais)">Afonso Pena (Sao Jose Dos Pinhais)</option>
+            <option value="Alto Boqueirao">Alto Boqueirao</option>
+            <option value="Bacacheri">Bacacheri</option>
+            <option value="Bom Jesus (Campo Largo)">Bom Jesus (Campo Largo)</option>
+            <option value="Bonfim (Almirante Tamandare)">Bonfim (Almirante Tamandare)</option>
+            <option value="Botiatuva (Campo Largo)">Botiatuva (Campo Largo)</option>
+            <option value="Cachoeira (Almirante Tamandare)">Cachoeira (Almirante Tamandare)</option>
+            <option value="Cachoeira (Araucaria)">Cachoeira (Araucaria)</option>
+            <option value="Campina Da Barra (Araucaria)">Campina Da Barra (Araucaria)</option>
+            <option value="Campo De Santana">Campo De Santana</option>
+            <option value="Campo Do Meio (Campo Largo)">Campo Do Meio (Campo Largo)</option>
+            <option value="Capao Raso">Capao Raso</option>
+            <option value="Capela Velha (Araucaria)">Capela Velha (Araucaria)</option>
+            <option value="Capão Raso">Capão Raso</option>
+            <option value="Centro">Centro</option>
+            <option value="Cidade Industrial">Cidade Industrial</option>
+            <option value="Colonia Lam. Grande (Almirante Tamandare)">Colonia Lam. Grande (Almirante Tamandare)</option>
+            <option value="Colonia Rio Grande (Sao Jose Dos Pinhais)">Colonia Rio Grande (Sao Jose Dos Pinhais)</option>
+            <option value="Costeira (Araucaria)">Costeira (Araucaria)</option>
+            <option value="Estacao (Araucaria)">Estacao (Araucaria)</option>
+            <option value="Estados (Fazenda Rio Grande)">Estados (Fazenda Rio Grande)</option>
+            <option value="Eucaliptos (Fazenda Rio Grande)">Eucaliptos (Fazenda Rio Grande)</option>
+            <option value="Gralha Azul (Fazenda Rio Grande)">Gralha Azul (Fazenda Rio Grande)</option>
+            <option value="Iguacu (Araucaria)">Iguacu (Araucaria)</option>
+            <option value="Iguacu (Fazenda Rio Grande)">Iguacu (Fazenda Rio Grande)</option>
+            <option value="Ina (Sao Jose Dos Pinhais)">Ina (Sao Jose Dos Pinhais)</option>
+            <option value="Itaboa (Campo Largo)">Itaboa (Campo Largo)</option>
+            <option value="Italia (Sao Jose Dos Pinhais)">Italia (Sao Jose Dos Pinhais)</option>
+            <option value="Itaqui (Campo Largo)">Itaqui (Campo Largo)</option>
+            <option value="Jardim Buenos Aires (Almirante Tamandare)">Jardim Buenos Aires (Almirante Tamandare)</option>
+            <option value="Jardim Das Americas">Jardim Das Americas</option>
+            <option value="Jardim Itaqui (Campo Largo)">Jardim Itaqui (Campo Largo)</option>
+            <option value="Jardim Rivabem (Campo Largo)">Jardim Rivabem (Campo Largo)</option>
+            <option value="Mato Dentro (Almirante Tamandare)">Mato Dentro (Almirante Tamandare)</option>
+            <option value="Moradias Bom Jesus (Campo Largo)">Moradias Bom Jesus (Campo Largo)</option>
+            <option value="Novo Mundo">Novo Mundo</option>
+            <option value="Nucleo Colonial De Pinhais (Pinhais)">Nucleo Colonial De Pinhais (Pinhais)</option>
+            <option value="Ouro Fino (Sao Jose Dos Pinhais)">Ouro Fino (Sao Jose Dos Pinhais)</option>
+            <option value="Ouro Verde (Campo Largo)">Ouro Verde (Campo Largo)</option>
+            <option value="Palmital (Colombo)">Palmital (Colombo)</option>
+            <option value="Pinheirinho">Pinheirinho</option>
+            <option value="Santa Candida">Santa Candida</option>
+            <option value="Santa Cândida">Santa Cândida</option>
+            <option value="Sao Gabriel (Colombo)">Sao Gabriel (Colombo)</option>
+            <option value="Tatuquara">Tatuquara</option>
+            <option value="Thomaz Coelho (Araucaria)">Thomaz Coelho (Araucaria)</option>
+            <option value="Tindiquera (Araucaria)">Tindiquera (Araucaria)</option>
+            <option value="Tingui">Tingui</option>
+            <option value="Uberaba">Uberaba</option>
+            <option value="Veneza (Fazenda Rio Grande)">Veneza (Fazenda Rio Grande)</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label>Score mínimo</label>
+          <select id="filterScore" onchange="applyFilters()">
+            <option value="0">Todos</option>
+            <option value="30">30+</option>
+            <option value="50">50+ (bom)</option>
+            <option value="60">60+ (ótimo)</option>
+            <option value="70">70+ (excelente)</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label>Preço máx.</label>
+          <select id="filterMaxPrice" onchange="applyFilters()">
+            <option value="0">Sem limite</option>
+            <option value="200000">R$200k</option>
+            <option value="400000">R$400k</option>
+            <option value="600000">R$600k</option>
+            <option value="800000">R$800k</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label>Fonte</label>
+          <select id="filterSource" onchange="applyFilters()">
+            <option value="">Todas</option>
+            <option value="Caixa Econômica">Caixa Econômica</option>
+            <option value="Portal Zuk">Portal Zuk</option>
+          </select>
+        </div>
+      </div>
+      <div class="sort-row">
+        <span style="color:#8b949e;font-size:0.85em;line-height:2;">Ordenar:</span>
+        <button class="sort-btn active" data-sort="score" onclick="setSort('score')">⭐ Score</button>
+        <button class="sort-btn" data-sort="price-asc" onclick="setSort('price-asc')">💰 Preço ↑</button>
+        <button class="sort-btn" data-sort="price-desc" onclick="setSort('price-desc')">💰 Preço ↓</button>
+        <button class="sort-btn" data-sort="discount" onclick="setSort('discount')">📉 Desconto</button>
+        <button class="sort-btn" data-sort="m2" onclick="setSort('m2')">📐 R$/m²</button>
+        <button class="sort-btn" data-sort="real-discount" onclick="setSort('real-discount')">🎯 Desc. Real</button>
+      </div>
+    </div>
+
+    <div class="results-count" id="resultsCount"></div>
+    <div class="cards" id="cardsContainer"></div>
+    <button class="load-more" id="loadMore" onclick="loadMore()" style="display:none;">Mostrar mais</button>
+
+    <footer>
+      <p>Fontes: Caixa Econômica, Portal Zuk • Gerado automaticamente por 🐦 Avê</p>
+      <p style="margin-top: 10px; font-size: 0.85em;">Score = desconto nominal + desconto real vs mercado + vagas + bairro + ocupação + prazo</p>
+    </footer>
+  </div>
+
+  <script>
+    const ALL_PROPERTIES = [{"id":"caixa-10139954","tipo":"Imóvel","bairro":"Mato Dentro (Almirante Tamandare)","endereco":"RODOVIA DOS MINýRIOS, N. 6750, GLEBA","lance":1017119.59,"avaliacao":4261000,"desconto":76.13,"modalidade":"Gleba, 0.00 de ýrea total, 0.00 de ýrea privativa, 72600.00 de ýrea do terreno.","encerramento":null,"ocupacao":"desconhecido","fonte":"Caixa Econômica","link":"Venda Direta Online","novo":false,"prioridade":false,"score":58},{"id":"caixa-10301532","tipo":"Imóvel","bairro":"Centro","endereco":"RUA JOSý LOUREIRO, N. 569, SL 804 - ALA TOWER","lance":172074.86,"avaliacao":270000,"desconto":36.27,"modalidade":"Sala, 0.00 de ýrea total, 34.20 de ýrea privativa, 0.00 de ýrea do terreno.","encerramento":null,"ocupacao":"desconhecido","fonte":"Caixa Econômica","link":"Venda Direta Online","novo":false,"prioridade":true,"score":53},{"id":"caixa-8787705222474","tipo":"Imóvel","bairro":"Bom Jesus (Campo Largo)","endereco":"RODOVIA DOS EXPEDICIONARIOS, N. 1145, Apto 1748, BL 17 VAGA 533","lance":105772.36,"avaliacao":200000,"desconto":47.12,"modalidade":"Apartamento, 58.67 de ýrea total, 40.31 de ýrea privativa, 0.00 de ýrea do terreno,  2 qto(s), WC, 1 sala(s), cozinha, 1 vaga(s) de garagem.","encerramento":null,"ocupacao":"desconhecido","fonte":"Caixa Econômica","link":"Venda Online","novo":false,"prioridade":false,"vagas":1,"score":52},{"id":"caixa-8787705253957","tipo":"Imóvel","bairro":"Bom Jesus (Campo Largo)","endereco":"RODOVIA DOS EXPEDICIONARIOS, N. 1145, Apto 1514, BL 15","lance":107887.81,"avaliacao":210000,"desconto":48.63,"modalidade":"Apartamento, 46.20 de ýrea total, 40.31 de ýrea privativa, 0.00 de ýrea do terreno,  2 qto(s), a.serv, WC, 1 sala(s), cozinha, 1 vaga(s) de garagem.","encerramento":null,"ocupacao":"desconhecido","fonte":"Caixa Econômica","link":"Venda Online","novo":false,"prioridade":false,"score":50},{"id":"caixa-8787704995690","tipo":"Imóvel","bairro":"Bom Jesus (Campo Largo)","endereco":"AVENIDA DOS EXPEDICIONARIOS, N. 4799, Apto 2245, BL 22 VG 679","lance":105772.36,"avaliacao":200000,"desconto":47.12,"modalidade":"Apartamento, 46.18 de ýrea total, 40.31 de ýrea privativa, 0.00 de ýrea do terreno,  2 qto(s), WC, 1 sala(s), cozinha, 1 vaga(s) de garagem.","encerramento":null,"ocupacao":"desconhecido","fonte":"Caixa Econômica","link":"Venda Online","novo":false,"prioridade":false,"score":50},{"id":"caixa-1444401657585","tipo":"Imóvel","bairro":"Santa Candida","endereco":"RUA JOAO MEQUETTI, N. 625, Apto 13, BL 04","lance":87874.61,"avaliacao":163500,"desconto":46.26,"modalidade":"Apartamento, 0.00 de ýrea total, 42.90 de ýrea privativa, 0.00 de ýrea do terreno,  2 qto(s), a.serv, WC, 1 sala(s), cozinha.","encerramento":null,"ocupacao":"desconhecido","fonte":"Caixa Econômica","link":"Licitaýýo Aberta","novo":false,"prioridade":false,"score":50},{"id":"zuk-236664","tipo":"Casa","bairro":"Santa Cândida","endereco":"Rua João Pedro Jonsson Kronland,  171","lance":1606939.9,"avaliacao":2945744.15,"desconto":45,"modalidade":"Leilão 2ª Praça","encerramento":"2026-11-03","ocupacao":"ocupado","area":"350,50m² construída","fonte":"Portal Zuk","link":"https://www.portalzuk.com.br/imovel/pr/curitiba/santa-candida/rua-joao-pedro-jonsson-kronland-171/37625-236664","novo":false,"prioridade":false,"precoM2":4585,"score":49},{"id":"caixa-8787702208306","tipo":"Imóvel","bairro":"Jardim Itaqui (Campo Largo)","endereco":"RUA MARIA JOAQUINA VAZ, N. 721, Apto 106, BL 29 VG 1073","lance":137768.51,"avaliacao":250000,"desconto":44.9,"modalidade":"Apartamento, 45.91 de ýrea total, 40.00 de ýrea privativa, 0.00 de ýrea do terreno,  2 qto(s), WC, 1 sala(s), cozinha, 1 vaga(s) de garagem.","encerramento":null,"ocupacao":"desconhecido","fonte":"Caixa Econômica","link":"Venda Direta Online","novo":false,"prioridade":false,"score":49},{"id":"caixa-8787705624556","tipo":"Imóvel","bairro":"Bom Jesus (Campo Largo)","endereco":"AVENIDA DOS EXPEDICIONARIOS, N. SN, Apto 1322, BLOCO 13, VAGA 49","lance":121487.11,"avaliacao":201000,"desconto":39.56,"modalidade":"Apartamento, 40.00 de ýrea total, 40.00 de ýrea privativa, 0.00 de ýrea do terreno,  2 qto(s), a.serv, WC, 1 sala(s), cozinha, 1 vaga(s) de garagem.","encerramento":null,"ocupacao":"desconhecido","fonte":"Caixa Econômica","link":"Venda Direta Online","novo":false,"prioridade":false,"vagas":1,"score":49},{"id":"caixa-8787705639308","tipo":"Imóvel","bairro":"Bom Jesus (Campo Largo)","endereco":"AVENIDA DOS EXPEDICIONARIOS, N. SN, Apto 1545, BLOCO 15, VAGA 56","lance":122091.53,"avaliacao":202000,"desconto":39.56,"modalidade":"Apartamento, 40.31 de ýrea total, 40.31 de ýrea privativa, 0.00 de ýrea do terreno,  2 qto(s), a.serv, WC, 1 sala(s), cozinha, 1 vaga(s) de garagem.","encerramento":null,"ocupacao":"desconhecido","fonte":"Caixa Econômica","link":"Venda Direta Online","novo":false,"prioridade":false,"vagas":1,"score":49},{"id":"caixa-8787702847805","tipo":"Imóvel","bairro":"Campo Do Meio (Campo Largo)","endereco":"RUA MARIA JOAQUINA VAZ, N. 721, Apto 302, BL 02, VAGA Ný 218","lance":126322.42,"avaliacao":209000,"desconto":39.56,"modalidade":"Apartamento, 56.90 de ýrea total, 40.00 de ýrea privativa, 0.00 de ýrea do terreno,  2 qto(s), a.serv, WC, 1 sala(s), cozinha, 1 vaga(s) de garagem.","encerramento":null,"ocupacao":"desconhecido","fonte":"Caixa Econômica","link":"Venda Direta Online","novo":false,"prioridade":false,"vagas":1,"score":49},{"id":"caixa-8787705691571","tipo":"Imóvel","bairro":"Bom Jesus (Campo Largo)","endereco":"RODOVIA DOS EXPEDICIONARIOS, N. 1145, Apto 1636, BL 16, VAGA Ný 298","lance":130467.25,"avaliacao":215857.6,"desconto":39.56,"modalidade":"Apartamento, 45.82 de ýrea total, 40.00 de ýrea privativa, 0.00 de ýrea do terreno,  2 qto(s), a.serv, WC, 1 sala(s), cozinha, 1 vaga(s) de garagem.","encerramento":null,"ocupacao":"desconhecido","fonte":"Caixa Econômica","link":"Venda Direta Online","novo":false,"prioridade":false,"vagas":1,"score":49},{"id":"caixa-8787700354267","tipo":"Imóvel","bairro":"Capela Velha (Araucaria)","endereco":"RUA YOSHIAKI NAGANO, N. 510, Apto 403, BL 13, VAGA N 92","lance":139015.11,"avaliacao":230000,"desconto":39.56,"modalidade":"Apartamento, 47.93 de ýrea total, 42.75 de ýrea privativa, 0.00 de ýrea do terreno,  2 qto(s), a.serv, WC, 1 sala(s), cozinha, 1 vaga(s) de garagem.","encerramento":null,"ocupacao":"desconhecido","fonte":"Caixa Econômica","link":"Licitaýýo Aberta","novo":false,"prioridade":false,"vagas":1,"score":49},{"id":"caixa-8787714508229","tipo":"Imóvel","bairro":"Iguacu (Araucaria)","endereco":"RUA PARANAGUA, N. 520, Apto 305, BL E, VAGA N 56","lance":157362.26,"avaliacao":257000,"desconto":38.77,"modalidade":"Apartamento, 0.00 de ýrea total, 46.68 de ýrea privativa, 0.00 de ýrea do terreno, 1 vaga(s) de garagem.","encerramento":null,"ocupacao":"desconhecido","fonte":"Caixa Econômica","link":"Venda Online","novo":false,"prioridade":false,"vagas":1,"score":49},{"id":"caixa-8787704882381","tipo":"Imóvel","bairro":"Bom Jesus (Campo Largo)","endereco":"RODOVIA DOS EXPEDICIONARIOS, N. 1145, Apto 941, BL 09 4ýANDAR VG 376","lance":105708.9,"avaliacao":184100,"desconto":42.59,"modalidade":"Apartamento, 46.17 de ýrea total, 40.31 de ýrea privativa, 0.00 de ýrea do terreno,  2 qto(s), WC, 1 sala(s), cozinha, 1 vaga(s) de garagem.","encerramento":null,"ocupacao":"desconhecido","fonte":"Caixa Econômica","link":"Venda Online","novo":false,"prioridade":false,"score":48},{"id":"caixa-8787705920686","tipo":"Imóvel","bairro":"Jardim Itaqui (Campo Largo)","endereco":"RUA MARIA JOAQUINA VAZ, N. 721, Apto 303, BL 05 3 PAVIMENTO","lance":107948.25,"avaliacao":188000,"desconto":42.59,"modalidade":"Apartamento, 57.91 de ýrea total, 40.00 de ýrea privativa, 0.00 de ýrea do terreno,  2 qto(s), WC, 1 sala(s), cozinha, 1 vaga(s) de garagem.","encerramento":null,"ocupacao":"desconhecido","fonte":"Caixa Econômica","link":"Venda Online","novo":false,"prioridade":false,"score":48},{"id":"caixa-8787705475852","tipo":"Imóvel","bairro":"Bom Jesus (Campo Largo)","endereco":"AV DOS EXPEDICIONARIOS, N. 1145, Apto 1526, TIPO 1, BL 15","lance":117709.53,"avaliacao":205000,"desconto":42.59,"modalidade":"Apartamento, 45.82 de ýrea total, 40.00 de ýrea privativa, 0.00 de ýrea do terreno,  2 qto(s), WC, 1 sala(s), cozinha, 1 vaga(s) de garagem.","encerramento":null,"ocupacao":"desconhecido","fonte":"Caixa Econômica","link":"Venda Online","novo":false,"prioridade":false,"score":48},{"id":"caixa-1787701168213","tipo":"Imóvel","bairro":"Jardim Itaqui (Campo Largo)","endereco":"RUA MARIA JOAQUINA VAZ, N. 721, Apto 302, BL 26","lance":140716.12,"avaliacao":241000,"desconto":41.62,"modalidade":"Apartamento, 46.27 de ýrea total, 40.31 de ýrea privativa, 137040.97 de ýrea do terreno,  2 qto(s), WC, 1 sala(s), cozinha, 1 vaga(s) de garagem.","encerramento":null,"ocupacao":"desconhecido","fonte":"Caixa Econômica","link":"Venda Direta Online","novo":false,"prioridade":false,"score":48},{"id":"caixa-8444407676490","tipo":"Imóvel","bairro":"Gralha Azul (Fazenda Rio Grande)","endereco":"RUA CHOPIM, N. 710, CS 152","lance":150897.57,"avaliacao":257684.9,"desconto":41.45,"modalidade":"Casa, 0.00 de ýrea total, 72.00 de ýrea privativa, 108.00 de ýrea do terreno, 1 vaga(s) de garagem.","encerramento":null,"ocupacao":"desconhecido","fonte":"Caixa Econômica","link":"Venda Online","novo":false,"prioridade":false,"score":48},{"id":"caixa-1444418887481","tipo":"Imóvel","bairro":"Academia (Sao Jose Dos Pinhais)","endereco":"RUA MARIA ALICE SADEMBERG, N. 324, LT 11 QD 05","lance":170959.56,"avaliacao":290000,"desconto":41.05,"modalidade":"Terreno, 0.00 de ýrea total, 0.00 de ýrea privativa, 480.00 de ýrea do terreno.","encerramento":null,"ocupacao":"desconhecido","fonte":"Caixa Econômica","link":"Venda Direta Online","novo":false,"prioridade":false,"score":48},{"id":"caixa-1444418870180","tipo":"Imóvel","bairro":"Gralha Azul (Fazenda Rio Grande)","endereco":"RUA CHOPIM ESQ RUA JURUVIARA, N. 288, CS 01 PARTE LT 101 QD 11","lance":229911.13,"avaliacao":390000,"desconto":41.05,"modalidade":"Casa, 138.91 de ýrea total, 51.72 de ýrea privativa, 194.79 de ýrea do terreno,  4 qto(s), a.serv, WC, 1 sala(s), cozinha, 1 vaga(s) de garagem.","encerramento":null,"ocupacao":"desconhecido","fonte":"Caixa Econômica","link":"Venda Direta Online","novo":false,"prioridade":false,"score":48},{"id":"caixa-1555528553075","tipo":"Imóvel","bairro":"Tingui","endereco":"RUA JOAO BATISTA TRENTIN, N. 796, 200","lance":1344095.85,"avaliacao":2280000,"desconto":41.05,"modalidade":"Casa, 410.32 de ýrea total, 410.32 de ýrea privativa, 528.00 de ýrea do terreno,  3 qto(s), a.serv, WC, 4 sala(s), cozinha.","encerramento":null,"ocupacao":"desconhecido","fonte":"Caixa Econômica","link":"Venda Direta Online","novo":false,"prioridade":false,"score":48},{"id":"caixa-8787707766854","tipo":"Imóvel","bairro":"Bonfim (Almirante Tamandare)","endereco":"RUA ALFREDO DE ANDRADE, N. 75, Apto 303, BL 07 VG 193","lance":94609.15,"avaliacao":159652.4,"desconto":40.75,"modalidade":"Apartamento, 45.48 de ýrea total, 40.00 de ýrea privativa, 0.00 de ýrea do terreno,  2 qto(s), WC, 1 sala(s), cozinha, 1 vaga(s) de garagem.","encerramento":null,"ocupacao":"desconhecido","fonte":"Caixa Econômica","link":"Licitaýýo Aberta","novo":false,"prioridade":false,"score":48},{"id":"caixa-8787703362783","tipo":"Imóvel","bairro":"Jardim Itaqui (Campo Largo)","endereco":"RUA MARIA JOAQUINA VAZ, N. 721, Apto 402, BL 18  VG 398","lance":100148.49,"avaliacao":169000,"desconto":40.75,"modalidade":"Apartamento, 45.91 de ýrea total, 40.00 de ýrea privativa, 0.00 de ýrea do terreno,  2 qto(s), a.serv, WC, 1 sala(s), cozinha, 1 vaga(s) de garagem.","encerramento":null,"ocupacao":"desconhecido","fonte":"Caixa Econômica","link":"Licitaýýo Aberta","novo":false,"prioridade":false,"score":48},{"id":"caixa-8787714163000","tipo":"Imóvel","bairro":"Botiatuva (Campo Largo)","endereco":"RUA MANOEL LOPES VIEIRA, N. 143, Apto 101, BL  07 VG 76","lance":100741.08,"avaliacao":170000,"desconto":40.75,"modalidade":"Apartamento, 46.66 de ýrea total, 40.31 de ýrea privativa, 0.00 de ýrea do terreno,  2 qto(s), WC, 1 sala(s), cozinha, 1 vaga(s) de garagem.","encerramento":null,"ocupacao":"desconhecido","fonte":"Caixa Econômica","link":"Licitaýýo Aberta","novo":false,"prioridade":false,"score":48},{"id":"caixa-8787714182609","tipo":"Imóvel","bairro":"Itaqui (Campo Largo)","endereco":"RUA PROFESSOR OVIDIO JORGE NOGUEIRA, N. 77, Apto 208, BL 07","lance":100741.08,"avaliacao":170000,"desconto":40.75,"modalidade":"Apartamento, 58.31 de ýrea total, 49.84 de ýrea privativa, 0.00 de ýrea do terreno,  2 qto(s), WC, 1 sala(s), cozinha.","encerramento":null,"ocupacao":"desconhecido","fonte":"Caixa Econômica","link":"Licitaýýo Aberta","novo":false,"prioridade":false,"score":48},{"id":"caixa-8787714096222","tipo":"Imóvel","bairro":"Botiatuva (Campo Largo)","endereco":"RUA MANOEL LOPES VIEIRA, N. 143, Apto 307, BL  11 VG 249","lance":103704.06,"avaliacao":175000,"desconto":40.75,"modalidade":"Apartamento, 46.12 de ýrea total, 40.00 de ýrea privativa, 0.00 de ýrea do terreno,  2 qto(s), WC, 1 sala(s), cozinha, 1 vaga(s) de garagem.","encerramento":null,"ocupacao":"desconhecido","fonte":"Caixa Econômica","link":"Licitaýýo Aberta","novo":false,"prioridade":false,"score":48},{"id":"caixa-8787702890824","tipo":"Imóvel","bairro":"Jardim Itaqui (Campo Largo)","endereco":"RUA MARIA JOAQUINA VAZ, N. 721, Apto 402, BL 07 BOX 199","lance":105481.84,"avaliacao":178000,"desconto":40.75,"modalidade":"Apartamento, 45.91 de ýrea total, 40.00 de ýrea privativa, 0.00 de ýrea do terreno,  2 qto(s), WC, 1 sala(s), cozinha, 1 vaga(s) de garagem.","encerramento":null,"ocupacao":"desconhecido","fonte":"Caixa Econômica","link":"Venda Online","novo":false,"prioridade":false,"score":48},{"id":"caixa-8787714159712","tipo":"Imóvel","bairro":"Botiatuva (Campo Largo)","endereco":"RUA MANOEL LOPES VIEIRA, N. 143, Apto 405, BL 08","lance":106074.43,"avaliacao":179000,"desconto":40.75,"modalidade":"Apartamento, 46.48 de ýrea total, 40.31 de ýrea privativa, 0.00 de ýrea do terreno,  2 qto(s), WC, 1 sala(s), cozinha, 1 vaga(s) de garagem.","encerramento":null,"ocupacao":"desconhecido","fonte":"Caixa Econômica","link":"Venda Direta Online","novo":false,"prioridade":false,"score":48},{"id":"caixa-8787702864998","tipo":"Imóvel","bairro":"Jardim Itaqui (Campo Largo)","endereco":"RUA MARIA JOAQUINA VAZ, N. 721, Apto 404, BL 08, TIPO 48,","lance":106294.02,"avaliacao":179370.55,"desconto":40.75,"modalidade":"Apartamento, 50.04 de ýrea total, 43.61 de ýrea privativa, 0.00 de ýrea do terreno,  2 qto(s), a.serv, WC, 1 sala(s), cozinha, 1 vaga(s) de garagem.","encerramento":null,"ocupacao":"desconhecido","fonte":"Caixa Econômica","link":"Licitaýýo Aberta","novo":false,"prioridade":false,"score":48},{"id":"caixa-8787703161273","tipo":"Imóvel","bairro":"Jardim Itaqui (Campo Largo)","endereco":"RUA MARIA JOAQUINA VAZ, N. 721, Apto 103, BL 04 VG 237","lance":106667.03,"avaliacao":180000,"desconto":40.75,"modalidade":"Apartamento, 45.91 de ýrea total, 40.00 de ýrea privativa, 0.00 de ýrea do terreno,  2 qto(s), WC, 1 sala(s), cozinha, 1 vaga(s) de garagem.","encerramento":null,"ocupacao":"desconhecido","fonte":"Caixa Econômica","link":"Venda Direta Online","novo":false,"prioridade":false,"score":48},{"id":"caixa-8787720290876","tipo":"Imóvel","bairro":"Botiatuva (Campo Largo)","endereco":"RUA MANOEL LOPES VIEIRA, N. 143, Apto 106, BL 08 VG 122","lance":108444.81,"avaliacao":183000,"desconto":40.75,"modalidade":"Apartamento, 66.14 de ýrea total, 40.00 de ýrea privativa, 0.00 de ýrea do terreno,  2 qto(s), a.serv, WC, 1 sala(s), cozinha, Terraco, 1 vaga(s) de garagem.","encerramento":null,"ocupacao":"desconhecido","fonte":"Caixa Econômica","link":"Licitaýýo Aberta","novo":false,"prioridade":false,"score":48},{"id":"caixa-8787701955078","tipo":"Imóvel","bairro":"Jardim Itaqui (Campo Largo)","endereco":"RUA MARIA JOAQUINA VAZ, N. SN, Apto 102, BL 35","lance":113610.9,"avaliacao":190000,"desconto":40.21,"modalidade":"Apartamento, 0.00 de ýrea total, 40.00 de ýrea privativa, 0.00 de ýrea do terreno,  2 qto(s), WC, 1 sala(s), cozinha, 1 vaga(s) de garagem.","encerramento":null,"ocupacao":"desconhecido","fonte":"Caixa Econômica","link":"Venda Online","novo":false,"prioridade":false,"score":47},{"id":"caixa-8444416357815","tipo":"Imóvel","bairro":"Tatuquara","endereco":"RUA OLAVO PEREIRA VILAS BOAS, N. 399, CASA 02,","lance":130800,"avaliacao":218000,"desconto":40,"modalidade":"Casa, 37.10 de ýrea total, 37.10 de ýrea privativa, 80.00 de ýrea do terreno,  2 qto(s), a.serv, WC, 1 sala(s), cozinha.","encerramento":null,"ocupacao":"desconhecido","fonte":"Caixa Econômica","link":"Leilýo SFI - Edital ýnico","novo":false,"prioridade":false,"score":47},{"id":"caixa-8787703259761","tipo":"Imóvel","bairro":"Jardim Itaqui (Campo Largo)","endereco":"RUA MARIA JOAQUINA VAZ, N. 721, Apto 202, BLOCO 01,  2ý PAVIMENTO,","lance":111212.08,"avaliacao":184000,"desconto":39.56,"modalidade":"Apartamento, 45.92 de ýrea total, 40.00 de ýrea privativa, 0.00 de ýrea do terreno,  2 qto(s), a.serv, WC, 1 sala(s), cozinha, 1 vaga(s) de garagem.","encerramento":null,"ocupacao":"desconhecido","fonte":"Caixa Econômica","link":"Venda Direta Online","novo":false,"prioridade":false,"score":47},{"id":"caixa-8787701698989","tipo":"Imóvel","bairro":"Jardim Itaqui (Campo Largo)","endereco":"RUA MARIA JOAQUINA VAZ, N. 721, Apto 207, BL 33 VG 836","lance":111816.5,"avaliacao":185000,"desconto":39.56,"modalidade":"Apartamento, 45.91 de ýrea total, 40.00 de ýrea privativa, 0.00 de ýrea do terreno,  2 qto(s), a.serv, WC, 1 sala(s), cozinha, 1 vaga(s) de garagem.","encerramento":null,"ocupacao":"desconhecido","fonte":"Caixa Econômica","link":"Venda Direta Online","novo":false,"prioridade":false,"score":47},{"id":"caixa-8787714176617","tipo":"Imóvel","bairro":"Botiatuva (Campo Largo)","endereco":"RUA MANOEL LOPES VIEIRA, N. 143, Apto 306,  BL 06, TIPO K","lance":111816.5,"avaliacao":185000,"desconto":39.56,"modalidade":"Apartamento, 0.00 de ýrea total, 40.00 de ýrea privativa, 0.00 de ýrea do terreno,  2 qto(s), WC, 1 sala(s), cozinha, 1 vaga(s) de garagem.","encerramento":null,"ocupacao":"desconhecido","fonte":"Caixa Econômica","link":"Venda Direta Online","novo":false,"prioridade":false,"score":47},{"id":"caixa-8444433965534","tipo":"Imóvel","bairro":"Bom Jesus (Campo Largo)","endereco":"RODOVIA DOS EXPEDICIONARIOS, N. 1145, Apto 3026, BL 30 VG 943","lance":111816.5,"avaliacao":185000,"desconto":39.56,"modalidade":"Apartamento, 58.32 de ýrea total, 40.00 de ýrea privativa, 0.00 de ýrea do terreno,  2 qto(s), WC, 1 sala(s), cozinha, 1 vaga(s) de garagem.","encerramento":null,"ocupacao":"desconhecido","fonte":"Caixa Econômica","link":"Venda Direta Online","novo":false,"prioridade":false,"score":47},{"id":"caixa-8787714595962","tipo":"Imóvel","bairro":"Botiatuva (Campo Largo)","endereco":"RUA MANOEL LOPES VIEIRA, N. 143, Apto 105, BL 04 ANDAR TERREO TIPO A  VG 307","lance":112420.91,"avaliacao":186000,"desconto":39.56,"modalidade":"Apartamento, 0.00 de ýrea total, 40.31 de ýrea privativa, 0.00 de ýrea do terreno,  2 qto(s), WC, 1 sala(s), cozinha, 1 vaga(s) de garagem.","encerramento":null,"ocupacao":"desconhecido","fonte":"Caixa Econômica","link":"Venda Direta Online","novo":false,"prioridade":false,"score":47},{"id":"caixa-8787716715248","tipo":"Imóvel","bairro":"Botiatuva (Campo Largo)","endereco":"RUA MANOEL LOPES VIEIRA, N. 143, Apto 107, BL 03 VG 332 GARDEN","lance":112420.91,"avaliacao":186000,"desconto":39.56,"modalidade":"Apartamento, 0.00 de ýrea total, 59.45 de ýrea privativa, 0.00 de ýrea do terreno,  2 qto(s), a.serv, WC, 1 sala(s), cozinha, 1 vaga(s) de garagem.","encerramento":null,"ocupacao":"desconhecido","fonte":"Caixa Econômica","link":"Venda Direta Online","novo":false,"prioridade":false,"score":47},{"id":"caixa-8787703202964","tipo":"Imóvel","bairro":"Campo Do Meio (Campo Largo)","endereco":"RUA MARIA JOAQUINA VAZ, N. 721, Apto 204, BL 05 VG 146","lance":113097.02,"avaliacao":187118.62,"desconto":39.56,"modalidade":"Apartamento, 46.27 de ýrea total, 40.31 de ýrea privativa, 0.00 de ýrea do terreno,  2 qto(s), a.serv, WC, 1 sala(s), cozinha, 1 vaga(s) de garagem.","encerramento":null,"ocupacao":"desconhecido","fonte":"Caixa Econômica","link":"Venda Direta Online","novo":false,"prioridade":false,"score":47},{"id":"caixa-8787715714191","tipo":"Imóvel","bairro":"Itaboa (Campo Largo)","endereco":"RUA ANGELO ZANETTI, N. 795, Apto 303, BL 23","lance":113629.74,"avaliacao":188000,"desconto":39.56,"modalidade":"Apartamento, 51.84 de ýrea total, 47.09 de ýrea privativa, 0.00 de ýrea do terreno,  2 qto(s), WC, 1 sala(s), cozinha, 1 vaga(s) de garagem.","encerramento":null,"ocupacao":"desconhecido","fonte":"Caixa Econômica","link":"Licitaýýo Aberta","novo":false,"prioridade":false,"score":47},{"id":"caixa-8787705273699","tipo":"Imóvel","bairro":"Bom Jesus (Campo Largo)","endereco":"AV DOS EXPEDICIONARIOS, N. 1145, Apto 3328, BL 32","lance":114234.15,"avaliacao":189000,"desconto":39.56,"modalidade":"Apartamento, 49.94 de ýrea total, 43.61 de ýrea privativa, 0.00 de ýrea do terreno,  2 qto(s), WC, 1 sala(s), cozinha, 1 vaga(s) de garagem.","encerramento":null,"ocupacao":"desconhecido","fonte":"Caixa Econômica","link":"Venda Direta Online","novo":false,"prioridade":false,"score":47},{"id":"caixa-8787715439735","tipo":"Imóvel","bairro":"Ouro Verde (Campo Largo)","endereco":"RUA CAETANO MUNHOZ DA ROCHA, N. 1080, Apto 404, PAV 04 BL 09 VG N 614 TIPO 15","lance":114838.57,"avaliacao":190000,"desconto":39.56,"modalidade":"Apartamento, 46.02 de ýrea total, 40.31 de ýrea privativa, 0.00 de ýrea do terreno,  2 qto(s), WC, 1 sala(s), cozinha, 1 vaga(s) de garagem.","encerramento":null,"ocupacao":"desconhecido","fonte":"Caixa Econômica","link":"Venda Online","novo":false,"prioridade":false,"score":47},{"id":"caixa-8787704562964","tipo":"Imóvel","bairro":"Jardim Buenos Aires (Almirante Tamandare)","endereco":"RUA VEREADOR WADISLAU BUGALSKI, N. 3690, Apto 615, BL 06 TIPO 06 PAV TERREO VG N 165","lance":115442.98,"avaliacao":191000,"desconto":39.56,"modalidade":"Apartamento, 46.76 de ýrea total, 40.31 de ýrea privativa, 0.00 de ýrea do terreno,  2 qto(s), WC, 1 sala(s), cozinha, 1 vaga(s) de garagem.","encerramento":null,"ocupacao":"desconhecido","fonte":"Caixa Econômica","link":"Venda Online","novo":false,"prioridade":false,"score":47},{"id":"caixa-8787705230418","tipo":"Imóvel","bairro":"Bom Jesus (Campo Largo)","endereco":"RODOVIA DOS EXPEDICIONARIOS, N. 1145, Apto 2328, BL 23 2 PAVIMENTO","lance":116047.39,"avaliacao":192000,"desconto":39.56,"modalidade":"Apartamento, 46.17 de ýrea total, 40.31 de ýrea privativa, 0.00 de ýrea do terreno,  2 qto(s), WC, 1 sala(s), cozinha, 1 vaga(s) de garagem.","encerramento":null,"ocupacao":"desconhecido","fonte":"Caixa Econômica","link":"Venda Online","novo":false,"prioridade":false,"score":47},{"id":"caixa-8787705237501","tipo":"Imóvel","bairro":"Bom Jesus (Campo Largo)","endereco":"RODOVIA DOS EXPEDICIONARIOS, N. 1145, Apto 1345, BL 13 VG 508","lance":117860.63,"avaliacao":195000,"desconto":39.56,"modalidade":"Apartamento, 58.71 de ýrea total, 40.31 de ýrea privativa, 0.00 de ýrea do terreno,  2 qto(s), a.serv, WC, 1 sala(s), cozinha, Terraco, 1 vaga(s) de garagem.","encerramento":null,"ocupacao":"desconhecido","fonte":"Caixa Econômica","link":"Licitaýýo Aberta","novo":false,"prioridade":false,"score":47},{"id":"caixa-8787705391900","tipo":"Imóvel","bairro":"Bom Jesus (Campo Largo)","endereco":"RODOVIA DOS EXPEDICIONARIOS, N. 1145, Apto 2211, BL 22","lance":117860.63,"avaliacao":195000,"desconto":39.56,"modalidade":"Apartamento, 63.23 de ýrea total, 40.31 de ýrea privativa, 0.00 de ýrea do terreno,  2 qto(s), WC, 1 sala(s), cozinha, Terraco, 1 vaga(s) de garagem.","encerramento":null,"ocupacao":"desconhecido","fonte":"Caixa Econômica","link":"Venda Direta Online","novo":false,"prioridade":false,"score":47},{"id":"caixa-8787708365691","tipo":"Imóvel","bairro":"Bonfim (Almirante Tamandare)","endereco":"RUA ALFREDO DE ANDRADE, N. 75, Apto 408, BL 16","lance":120580.49,"avaliacao":199500,"desconto":39.56,"modalidade":"Apartamento, 0.00 de ýrea total, 40.31 de ýrea privativa, 0.00 de ýrea do terreno,  2 qto(s), a.serv, 1 sala(s), cozinha, 1 vaga(s) de garagem.","encerramento":null,"ocupacao":"desconhecido","fonte":"Caixa Econômica","link":"Venda Direta Online","novo":false,"prioridade":false,"score":47},{"id":"caixa-8555517103055","tipo":"Imóvel","bairro":"Tindiquera (Araucaria)","endereco":"RUA LINDOLFO LUIZ BOELL, N. 170, Apto 41, BL 04 VG 128","lance":120882.7,"avaliacao":200000,"desconto":39.56,"modalidade":"Apartamento, 0.00 de ýrea total, 42.27 de ýrea privativa, 0.00 de ýrea do terreno,  2 qto(s), WC, 1 sala(s), cozinha, 1 vaga(s) de garagem.","encerramento":null,"ocupacao":"desconhecido","fonte":"Caixa Econômica","link":"Licitaýýo Aberta","novo":false,"prioridade":false,"score":47},{"id":"caixa-8787704497623","tipo":"Imóvel","bairro":"Bom Jesus (Campo Largo)","endereco":"AVENIDA DOS EXPEDICIONARIOS, N. 1145, Apto 2617, BL 26","lance":120882.7,"avaliacao":200000,"desconto":39.56,"modalidade":"Apartamento, 65.96 de ýrea total, 40.00 de ýrea privativa, 0.00 de ýrea do terreno,  2 qto(s), WC, 1 sala(s), cozinha, Terraco, 1 vaga(s) de garagem.","encerramento":null,"ocupacao":"desconhecido","fonte":"Caixa Econômica","link":"Venda Direta Online","novo":false,"prioridade":false,"score":47},{"id":"caixa-8444429344326","tipo":"Imóvel","bairro":"Ouro Fino (Sao Jose Dos Pinhais)","endereco":"RUA MARIA PAULINA PEREIRA, N. 50, Apto 41, BL 09 LT C 701","lance":120882.7,"avaliacao":200000,"desconto":39.56,"modalidade":"Apartamento, 45.93 de ýrea total, 39.88 de ýrea privativa, 0.00 de ýrea do terreno,  2 qto(s), WC, 1 sala(s), cozinha.","encerramento":null,"ocupacao":"desconhecido","fonte":"Caixa Econômica","link":"Licitaýýo Aberta","novo":false,"prioridade":false,"score":47},{"id":"caixa-8787705647980","tipo":"Imóvel","bairro":"Bom Jesus (Campo Largo)","endereco":"RODOVIA DOS EXPEDICIONARIOS, N. 1145, Apto 1946, BL 19 PAV 04 VG 653","lance":121487.11,"avaliacao":201000,"desconto":39.56,"modalidade":"Apartamento, 0.00 de ýrea total, 40.00 de ýrea privativa, 0.00 de ýrea do terreno,  2 qto(s), WC, 1 sala(s), cozinha, 1 vaga(s) de garagem.","encerramento":null,"ocupacao":"desconhecido","fonte":"Caixa Econômica","link":"Venda Direta Online","novo":false,"prioridade":false,"score":47},{"id":"caixa-8787709676569","tipo":"Imóvel","bairro":"Itaqui (Campo Largo)","endereco":"RODOVIA DOS EXPEDICIONARIOS, N. SN, Apto 1232, BL 12","lance":124206.97,"avaliacao":205500,"desconto":39.56,"modalidade":"Apartamento, 45.82 de ýrea total, 40.00 de ýrea privativa, 0.00 de ýrea do terreno,  2 qto(s), WC, 1 sala(s), cozinha, 1 vaga(s) de garagem.","encerramento":null,"ocupacao":"desconhecido","fonte":"Caixa Econômica","link":"Venda Direta Online","novo":false,"prioridade":false,"score":47},{"id":"caixa-8787705144368","tipo":"Imóvel","bairro":"Pinheirinho","endereco":"RUA LUCIANO PIUZZI, N. 147, Apto 203, BL 23","lance":125113.59,"avaliacao":207000,"desconto":39.56,"modalidade":"Apartamento, 0.00 de ýrea total, 38.40 de ýrea privativa, 0.00 de ýrea do terreno, 1 vaga(s) de garagem.","encerramento":null,"ocupacao":"desconhecido","fonte":"Caixa Econômica","link":"Licitaýýo Aberta","novo":false,"prioridade":false,"score":47},{"id":"caixa-8787703961342","tipo":"Imóvel","bairro":"Campo Do Meio (Campo Largo)","endereco":"RUA MARIA JOAQUINA VAZ, N. 721, Apto 208, BL 15","lance":126926.84,"avaliacao":210000,"desconto":39.56,"modalidade":"Apartamento, 46.27 de ýrea total, 52.31 de ýrea privativa, 0.00 de ýrea do terreno,  2 qto(s), a.serv, WC, 1 sala(s), cozinha, 1 vaga(s) de garagem.","encerramento":null,"ocupacao":"desconhecido","fonte":"Caixa Econômica","link":"Venda Direta Online","novo":false,"prioridade":false,"score":47},{"id":"caixa-8787716393704","tipo":"Imóvel","bairro":"Estados (Fazenda Rio Grande)","endereco":"RUA JAGUARIAIVA, N. 2109, CS 284","lance":128740.08,"avaliacao":213000,"desconto":39.56,"modalidade":"Casa, 0.00 de ýrea total, 42.00 de ýrea privativa, 78.00 de ýrea do terreno.","encerramento":null,"ocupacao":"desconhecido","fonte":"Caixa Econômica","link":"Licitaýýo Aberta","novo":false,"prioridade":false,"score":47},{"id":"caixa-8787702354132","tipo":"Imóvel","bairro":"Jardim Itaqui (Campo Largo)","endereco":"RUA MARIA JOAQUINA VAZ, N. SN, Apto 303, TIPO 06 BL 29 VG 1086 LT 02 3ý PAV","lance":129344.49,"avaliacao":214000,"desconto":39.56,"modalidade":"Apartamento, 45.91 de ýrea total, 40.00 de ýrea privativa, 0.00 de ýrea do terreno,  2 qto(s), WC, 1 sala(s), cozinha, 1 vaga(s) de garagem.","encerramento":null,"ocupacao":"desconhecido","fonte":"Caixa Econômica","link":"Venda Direta Online","novo":false,"prioridade":false,"score":47},{"id":"caixa-8787714221345","tipo":"Imóvel","bairro":"Estados (Fazenda Rio Grande)","endereco":"RUA JAGUARIAIVA, N. 2109, CS 129  LT 24A","lance":130855.52,"avaliacao":216500,"desconto":39.56,"modalidade":"Casa, 42.00 de ýrea total, 42.00 de ýrea privativa, 78.00 de ýrea do terreno,  2 qto(s), a.serv, WC, 1 sala(s), cozinha.","encerramento":null,"ocupacao":"desconhecido","fonte":"Caixa Econômica","link":"Licitaýýo Aberta","novo":false,"prioridade":false,"score":47},{"id":"caixa-8444417311290","tipo":"Imóvel","bairro":"Thomaz Coelho (Araucaria)","endereco":"RUA PASCOAL FERNANDES LEITE, N. 109, Apto 24, BL 01 LT 05 QD J","lance":132970.97,"avaliacao":220000,"desconto":39.56,"modalidade":"Apartamento, 55.52 de ýrea total, 50.54 de ýrea privativa, 0.00 de ýrea do terreno,  2 qto(s), WC, 1 sala(s), cozinha.","encerramento":null,"ocupacao":"desconhecido","fonte":"Caixa Econômica","link":"Venda Online","novo":false,"prioridade":false,"score":47},{"id":"caixa-8787701801615","tipo":"Imóvel","bairro":"Estados (Fazenda Rio Grande)","endereco":"RUA MACAPA ( ANT RUA BOA VISTA), N. 136, Apto 8,  BL 19 VG 132","lance":132970.97,"avaliacao":220000,"desconto":39.56,"modalidade":"Apartamento, 48.74 de ýrea total, 45.50 de ýrea privativa, 0.00 de ýrea do terreno,  2 qto(s), WC, 1 sala(s), cozinha, 1 vaga(s) de garagem.","encerramento":null,"ocupacao":"desconhecido","fonte":"Caixa Econômica","link":"Licitaýýo Aberta","novo":false,"prioridade":false,"score":47},{"id":"caixa-8787703015498","tipo":"Imóvel","bairro":"Capela Velha (Araucaria)","endereco":"RUA PELICANO, N. 1065, Apto 822, BL 08","lance":134784.21,"avaliacao":223000,"desconto":39.56,"modalidade":"Apartamento, 73.65 de ýrea total, 60.85 de ýrea privativa, 0.00 de ýrea do terreno,  3 qto(s), WC, 1 sala(s), cozinha, 1 vaga(s) de garagem.","encerramento":null,"ocupacao":"desconhecido","fonte":"Caixa Econômica","link":"Licitaýýo Aberta","novo":false,"prioridade":false,"score":47},{"id":"caixa-8787715985985","tipo":"Imóvel","bairro":"Ouro Verde (Campo Largo)","endereco":"RUA CAETANO MUNHOZ DA ROCHA, N. 1080, Apto 304, TIPO 15 PV 03 BL 15 VG 412","lance":145103.22,"avaliacao":236978.86,"desconto":38.77,"modalidade":"Apartamento, 46.02 de ýrea total, 40.31 de ýrea privativa, 0.00 de ýrea do terreno,  2 qto(s), WC, 1 sala(s), cozinha, 1 vaga(s) de garagem.","encerramento":null,"ocupacao":"desconhecido","fonte":"Caixa Econômica","link":"Venda Online","novo":false,"prioridade":false,"score":47},{"id":"caixa-8787715643120","tipo":"Imóvel","bairro":"Ouro Verde (Campo Largo)","endereco":"RUA CAETANO MUNHOZ DA ROCHA, N. 1080, Apto 305, BL10 VG 381","lance":162260.69,"avaliacao":265000,"desconto":38.77,"modalidade":"Apartamento, 46.02 de ýrea total, 40.31 de ýrea privativa, 0.00 de ýrea do terreno,  2 qto(s), a.serv, WC, 1 sala(s), cozinha, 1 vaga(s) de garagem.","encerramento":null,"ocupacao":"desconhecido","fonte":"Caixa Econômica","link":"Venda Direta Online","novo":false,"prioridade":false,"score":47},{"id":"caixa-8787715699060","tipo":"Imóvel","bairro":"Ouro Verde (Campo Largo)","endereco":"RUA CAETANO MUNHOZ DA ROCHA, N. 1080, Apto 208, BL 15 VG 408","lance":162260.69,"avaliacao":265000,"desconto":38.77,"modalidade":"Apartamento, 46.02 de ýrea total, 63.73 de ýrea privativa, 0.00 de ýrea do terreno,  2 qto(s), a.serv, WC, 1 sala(s), cozinha, 1 vaga(s) de garagem.","encerramento":null,"ocupacao":"desconhecido","fonte":"Caixa Econômica","link":"Venda Direta Online","novo":false,"prioridade":false,"score":47},{"id":"caixa-8787715736152","tipo":"Imóvel","bairro":"Ouro Verde (Campo Largo)","endereco":"RUA CAETANO MUNHOZ DA ROCHA, N. 1080, Apto 404, BL 02 VG 75","lance":162260.69,"avaliacao":265000,"desconto":38.77,"modalidade":"Apartamento, 46.02 de ýrea total, 52.31 de ýrea privativa, 0.00 de ýrea do terreno,  2 qto(s), a.serv, WC, 1 sala(s), cozinha, 1 vaga(s) de garagem.","encerramento":null,"ocupacao":"desconhecido","fonte":"Caixa Econômica","link":"Venda Direta Online","novo":false,"prioridade":false,"score":47},{"id":"caixa-8555516740043","tipo":"Imóvel","bairro":"Iguacu (Fazenda Rio Grande)","endereco":"RUA RIO BELEM, N. 225, CASA 03","lance":169118.5,"avaliacao":276200,"desconto":38.77,"modalidade":"Casa, 52.00 de ýrea total, 52.10 de ýrea privativa, 129.50 de ýrea do terreno,  1 qto(s), WC, 1 sala(s), cozinha.","encerramento":null,"ocupacao":"desconhecido","fonte":"Caixa Econômica","link":"Venda Online","novo":false,"prioridade":false,"score":47},{"id":"caixa-8787704873170","tipo":"Imóvel","bairro":"Bom Jesus (Campo Largo)","endereco":"RODOVIA DOS EXPEDICIONARIOS, N. 1145, Apto 2313, PAVIMENTO TýRREO, TIPO 6, BLOCO 23","lance":101904.73,"avaliacao":165000,"desconto":38.24,"modalidade":"Apartamento, 45.94 de ýrea total, 40.00 de ýrea privativa, 0.00 de ýrea do terreno,  2 qto(s), WC, 1 sala(s), cozinha, 1 vaga(s) de garagem.","encerramento":null,"ocupacao":"desconhecido","fonte":"Caixa Econômica","link":"Venda Direta Online","novo":false,"prioridade":false,"score":47},{"id":"caixa-10284141","tipo":"Imóvel","bairro":"Moradias Bom Jesus (Campo Largo)","endereco":"RUA JOýO TIGRINHO DE FREITAS/ ANTIGA UA 16, N. CS 16, CASA","lance":2361249.48,"avaliacao":3800000,"desconto":37.87,"modalidade":"Casa, 0.00 de ýrea total, 547.75 de ýrea privativa, 1468.00 de ýrea do terreno,  5 qto(s), varanda, a.serv, WC, WC Emp, 2 sala(s), 1 lavabo(s), cozinha, Terraco.","encerramento":null,"ocupacao":"desconhecido","fonte":"Caixa Econômica","link":"Venda Direta Online","novo":false,"prioridade":false,"score":47},{"id":"caixa-1444417259703","tipo":"Imóvel","bairro":"Eucaliptos (Fazenda Rio Grande)","endereco":"AVENIDA VENEZUELA, N. 1827, Apto 13, BL 57 VG 495","lance":142753.2,"avaliacao":226800,"desconto":37.06,"modalidade":"Apartamento, 49.30 de ýrea total, 42.57 de ýrea privativa, 0.00 de ýrea do terreno,  2 qto(s), WC, 1 sala(s), cozinha, 1 vaga(s) de garagem.","encerramento":null,"ocupacao":"desconhecido","fonte":"Caixa Econômica","link":"Venda Online","novo":false,"prioridade":false,"score":46},{"id":"caixa-1444421332665","tipo":"Imóvel","bairro":"Eucaliptos (Fazenda Rio Grande)","endereco":"AVENIDA PAINEIRAS, N. 1712, CS 24","lance":203940.58,"avaliacao":320000,"desconto":36.27,"modalidade":"Casa, 71.50 de ýrea total, 71.50 de ýrea privativa, 160.00 de ýrea do terreno,  3 qto(s), a.serv, WC, 1 sala(s), cozinha.","encerramento":null,"ocupacao":"desconhecido","fonte":"Caixa Econômica","link":"Licitaýýo Aberta","novo":false,"prioridade":false,"score":46},{"id":"caixa-8787714085565","tipo":"Imóvel","bairro":"Botiatuva (Campo Largo)","endereco":"RUA MANOEL LOPES VIEIRA, N. 143, Apto 207, TIPO I PAV 01 BL 06 VG 94","lance":121257.87,"avaliacao":190000,"desconto":36.19,"modalidade":"Apartamento, 46.12 de ýrea total, 40.00 de ýrea privativa, 0.00 de ýrea do terreno,  2 qto(s), WC, 1 sala(s), cozinha, 1 vaga(s) de garagem.","encerramento":null,"ocupacao":"desconhecido","fonte":"Caixa Econômica","link":"Leilýo SFI - Edital ýnico","novo":false,"prioridade":false,"score":46},{"id":"caixa-8787713174572","tipo":"Imóvel","bairro":"Colonia Lam. Grande (Almirante Tamandare)","endereco":"RUA ELIZIO FERREIRA DO NASCIMENTO, N. 807, Apto 401K, BL K VG 131","lance":138438.53,"avaliacao":204000,"desconto":32.14,"modalidade":"Apartamento, 45.67 de ýrea total, 41.11 de ýrea privativa, 0.00 de ýrea do terreno,  2 qto(s), a.serv, WC, 1 sala(s), cozinha, 1 vaga(s) de garagem.","encerramento":null,"ocupacao":"desconhecido","fonte":"Caixa Econômica","link":"Leilýo SFI - Edital ýnico","novo":false,"prioridade":false,"score":44},{"id":"caixa-8444422376699","tipo":"Imóvel","bairro":"Estados (Fazenda Rio Grande)","endereco":"RUA SERGIPE, N. 166, 01, 0320","lance":198691.93,"avaliacao":289400,"desconto":31.35,"modalidade":"Casa, 0.00 de ýrea total, 68.50 de ýrea privativa, 188.50 de ýrea do terreno,  3 qto(s), a.serv, WC, 1 sala(s), cozinha, 1 vaga(s) de garagem.","encerramento":null,"ocupacao":"desconhecido","fonte":"Caixa Econômica","link":"Leilýo SFI - Edital ýnico","novo":false,"prioridade":false,"score":44},{"id":"caixa-8787716993450","tipo":"Imóvel","bairro":"Botiatuva (Campo Largo)","endereco":"RUA MANOEL LOPES VIEIRA, N. 143, Apto 204, TIPO G PAV 01 BL 04 VG 317","lance":144384.17,"avaliacao":203000,"desconto":28.88,"modalidade":"Apartamento, 46.45 de ýrea total, 40.31 de ýrea privativa, 0.00 de ýrea do terreno,  2 qto(s), WC, 1 sala(s), cozinha, 1 vaga(s) de garagem.","encerramento":null,"ocupacao":"desconhecido","fonte":"Caixa Econômica","link":"Leilýo SFI - Edital ýnico","novo":false,"prioridade":false,"score":43},{"id":"caixa-8787707770894","tipo":"Imóvel","bairro":"Afonso Pena (Sao Jose Dos Pinhais)","endereco":"RUA ICARAI, N. 309, Apto 403, BL 02 VG 112","lance":157011.7,"avaliacao":216000,"desconto":27.31,"modalidade":"Apartamento, 45.82 de ýrea total, 38.40 de ýrea privativa, 0.00 de ýrea do terreno,  2 qto(s), WC, 1 sala(s), cozinha, 1 vaga(s) de garagem.","encerramento":null,"ocupacao":"desconhecido","fonte":"Caixa Econômica","link":"Leilýo SFI - Edital ýnico","novo":false,"prioridade":false,"score":43},{"id":"caixa-8444433131617","tipo":"Imóvel","bairro":"Gralha Azul (Fazenda Rio Grande)","endereco":"RUA ARAPONGAS, N. 196, CS 30","lance":220568.91,"avaliacao":280000,"desconto":21.23,"modalidade":"Casa, 42.00 de ýrea total, 42.00 de ýrea privativa, 97.26 de ýrea do terreno,  2 qto(s), varanda, WC, 1 sala(s), cozinha, 1 vaga(s) de garagem.","encerramento":null,"ocupacao":"desconhecido","fonte":"Caixa Econômica","link":"Leilýo SFI - Edital ýnico","novo":false,"prioridade":false,"score":41},{"id":"caixa-1444403573087","tipo":"Imóvel","bairro":"Centro","endereco":"TRAVESSA FREI CANECA, N. 55, Apto 05","lance":736171.46,"avaliacao":564666.86,"desconto":0,"modalidade":"Apartamento, 0.00 de ýrea total, 186.14 de ýrea privativa, 0.00 de ýrea do terreno,  3 qto(s), a.serv, WC, 2 sala(s), 1 lavabo(s), DCE, cozinha, 1 vaga(s) de garagem.","encerramento":null,"ocupacao":"desconhecido","fonte":"Caixa Econômica","link":"Leilýo SFI - Edital ýnico","novo":false,"prioridade":true,"score":40},{"id":"caixa-8787702389572","tipo":"Imóvel","bairro":"Santa Candida","endereco":"RUA THEODORO MAKIOLKA, N. 285, Apto 404, BLOCO 02","lance":248185.33,"avaliacao":267000,"desconto":7.05,"modalidade":"Apartamento, 0.00 de ýrea total, 40.28 de ýrea privativa, 0.00 de ýrea do terreno,  2 qto(s), a.serv, WC, 1 sala(s), cozinha, 1 vaga(s) de garagem.","encerramento":null,"ocupacao":"desconhecido","fonte":"Caixa Econômica","link":"Leilýo SFI - Edital ýnico","novo":false,"prioridade":false,"score":36},{"id":"caixa-8787704503240","tipo":"Imóvel","bairro":"Bom Jesus (Campo Largo)","endereco":"RODOVIA DOS EXPEDICIONARIOS, N. 1145, Apto 2516, BL 25 VAGA 848","lance":187000,"avaliacao":187000,"desconto":0,"modalidade":"Apartamento, 0.00 de ýrea total, 40.00 de ýrea privativa, 0.00 de ýrea do terreno,  2 qto(s), WC, 1 sala(s), cozinha, 1 vaga(s) de garagem.","encerramento":null,"ocupacao":"desconhecido","fonte":"Caixa Econômica","link":"Leilýo SFI - Edital ýnico","novo":false,"prioridade":false,"vagas":1,"score":35},{"id":"caixa-8787704017915","tipo":"Imóvel","bairro":"Jardim Itaqui (Campo Largo)","endereco":"RUA MARIA JOAQUINA VAZ, N. 721, Apto 304, BL 06 VAGA 283","lance":190000,"avaliacao":190000,"desconto":0,"modalidade":"Apartamento, 46.27 de ýrea total, 40.31 de ýrea privativa, 0.00 de ýrea do terreno,  2 qto(s), a.serv, WC, 1 sala(s), cozinha, 1 vaga(s) de garagem.","encerramento":null,"ocupacao":"desconhecido","fonte":"Caixa Econômica","link":"Leilýo SFI - Edital ýnico","novo":false,"prioridade":false,"vagas":1,"score":35},{"id":"caixa-8787700486732","tipo":"Imóvel","bairro":"Cachoeira (Almirante Tamandare)","endereco":"TRAVESSA SCHULTZ, N. 288, Apto 241, BL 02 VAGA 70","lance":194000,"avaliacao":194000,"desconto":0,"modalidade":"Apartamento, 0.00 de ýrea total, 42.83 de ýrea privativa, 0.00 de ýrea do terreno,  2 qto(s), a.serv, WC, 1 sala(s), cozinha, 1 vaga(s) de garagem.","encerramento":null,"ocupacao":"desconhecido","fonte":"Caixa Econômica","link":"Leilýo SFI - Edital ýnico","novo":false,"prioridade":false,"vagas":1,"score":35},{"id":"caixa-8787714144022","tipo":"Imóvel","bairro":"Botiatuva (Campo Largo)","endereco":"RUA MANOEL LOPES VIEIRA, N. 143, Apto 301, BL 08 VAGA 133","lance":198868,"avaliacao":198868,"desconto":0,"modalidade":"Apartamento, 47.71 de ýrea total, 40.31 de ýrea privativa, 0.00 de ýrea do terreno,  2 qto(s), WC, 1 sala(s), cozinha, 1 vaga(s) de garagem.","encerramento":null,"ocupacao":"desconhecido","fonte":"Caixa Econômica","link":"Leilýo SFI - Edital ýnico","novo":false,"prioridade":false,"vagas":1,"score":35},{"id":"caixa-1787702066660","tipo":"Imóvel","bairro":"Novo Mundo","endereco":"RODOVIA BR116, N. 15700, Apto 103, BL 02 VAGA 55","lance":313410.28,"avaliacao":280000,"desconto":0,"modalidade":"Apartamento, 58.23 de ýrea total, 44.09 de ýrea privativa, 0.00 de ýrea do terreno,  2 qto(s), a.serv, WC, 1 sala(s), cozinha, 1 vaga(s) de garagem.","encerramento":null,"ocupacao":"desconhecido","fonte":"Caixa Econômica","link":"Leilýo SFI - Edital ýnico","novo":false,"prioridade":false,"vagas":1,"score":35},{"id":"caixa-8444429616989","tipo":"Imóvel","bairro":"Estados (Fazenda Rio Grande)","endereco":"RUA MARANHAO, N. 372, CS 11","lance":213019.67,"avaliacao":215000,"desconto":0.93,"modalidade":"Casa, 43.00 de ýrea total, 43.00 de ýrea privativa, 63.00 de ýrea do terreno,  2 qto(s), WC, 1 sala(s), cozinha.","encerramento":null,"ocupacao":"desconhecido","fonte":"Caixa Econômica","link":"Leilýo SFI - Edital ýnico","novo":false,"prioridade":false,"score":33},{"id":"caixa-8787703341425","tipo":"Imóvel","bairro":"Jardim Itaqui (Campo Largo)","endereco":"RUA MARIA JOAQUINA VAZ, N. 721, Apto 303, TIPO 06 PAV 3 BL 21","lance":172000,"avaliacao":172000,"desconto":0,"modalidade":"Apartamento, 45.91 de ýrea total, 40.00 de ýrea privativa, 0.00 de ýrea do terreno,  2 qto(s), WC, 1 sala(s), cozinha, 1 vaga(s) de garagem.","encerramento":null,"ocupacao":"desconhecido","fonte":"Caixa Econômica","link":"Leilýo SFI - Edital ýnico","novo":false,"prioridade":false,"score":33},{"id":"caixa-8787705262263","tipo":"Imóvel","bairro":"Bom Jesus (Campo Largo)","endereco":"AVENIDA DOS EXPEDICIONARIOS, N. 1145, Apto 1014, BL 10","lance":175708.44,"avaliacao":160000,"desconto":0,"modalidade":"Apartamento, 46.20 de ýrea total, 40.31 de ýrea privativa, 0.00 de ýrea do terreno,  2 qto(s), WC, 1 sala(s), cozinha, 1 vaga(s) de garagem.","encerramento":null,"ocupacao":"desconhecido","fonte":"Caixa Econômica","link":"Leilýo SFI - Edital ýnico","novo":false,"prioridade":false,"score":33},{"id":"caixa-8787705451325","tipo":"Imóvel","bairro":"Bom Jesus (Campo Largo)","endereco":"RODOVIA DOS EXPEDICIONARIOS, N. 1145, Apto 815, BL 8  VG 223","lance":178478.86,"avaliacao":159000,"desconto":0,"modalidade":"Apartamento, 46.27 de ýrea total, 40.31 de ýrea privativa, 0.00 de ýrea do terreno,  2 qto(s), WC, 1 sala(s), cozinha, 1 vaga(s) de garagem.","encerramento":null,"ocupacao":"desconhecido","fonte":"Caixa Econômica","link":"Leilýo SFI - Edital ýnico","novo":false,"prioridade":false,"score":33},{"id":"caixa-8444407481630","tipo":"Imóvel","bairro":"Cidade Industrial","endereco":"RUA SALVADOR JOSE CORREIA COELHO N 440 AP14 AP 14, N. 440, Apto 14, LT01 QD B","lance":180000,"avaliacao":180000,"desconto":0,"modalidade":"Apartamento, 0.00 de ýrea total, 36.40 de ýrea privativa, 0.00 de ýrea do terreno.","encerramento":null,"ocupacao":"desconhecido","fonte":"Caixa Econômica","link":"Leilýo SFI - Edital ýnico","novo":false,"prioridade":false,"score":33},{"id":"caixa-8787707911838","tipo":"Imóvel","bairro":"Italia (Sao Jose Dos Pinhais)","endereco":"RUA PEDRINA COSTA VISKI, N. 788, Apto 102, BLOCO 04","lance":185000,"avaliacao":185000,"desconto":0,"modalidade":"Apartamento, 0.00 de ýrea total, 38.40 de ýrea privativa, 0.00 de ýrea do terreno,  1 qto(s), WC, 1 sala(s), cozinha, 1 vaga(s) de garagem.","encerramento":null,"ocupacao":"desconhecido","fonte":"Caixa Econômica","link":"Leilýo SFI - Edital ýnico","novo":false,"prioridade":false,"score":33},{"id":"caixa-8444415531323","tipo":"Imóvel","bairro":"Afonso Pena (Sao Jose Dos Pinhais)","endereco":"RUA ANTONIO SKAKUY, N. 66, Apto 12, LT04, QD H, JD IRACEMA 1","lance":187000,"avaliacao":187000,"desconto":0,"modalidade":"Apartamento, 47.68 de ýrea total, 42.00 de ýrea privativa, 0.00 de ýrea do terreno,  2 qto(s), WC, 1 sala(s), cozinha, 1 vaga(s) de garagem.","encerramento":null,"ocupacao":"desconhecido","fonte":"Caixa Econômica","link":"Leilýo SFI - Edital ýnico","novo":false,"prioridade":false,"score":33},{"id":"caixa-8787704840697","tipo":"Imóvel","bairro":"Bom Jesus (Campo Largo)","endereco":"RODOVIA DOS EXPEDICIONARIOS, N. 1145, Apto 111, TIPO 04 BL 1","lance":187200,"avaliacao":187200,"desconto":0,"modalidade":"Apartamento, 46.20 de ýrea total, 40.31 de ýrea privativa, 0.00 de ýrea do terreno,  2 qto(s), WC, 1 sala(s), cozinha, Terraco, 1 vaga(s) de garagem.","encerramento":null,"ocupacao":"desconhecido","fonte":"Caixa Econômica","link":"Leilýo SFI - Edital ýnico","novo":false,"prioridade":false,"score":33},{"id":"caixa-8555525482698","tipo":"Imóvel","bairro":"Sao Gabriel (Colombo)","endereco":"AVENIDA PREFEITO JOAO BATISTA STOCCO, N. 649, Apto 103, BL A","lance":189125,"avaliacao":185000,"desconto":0,"modalidade":"Apartamento, 0.00 de ýrea total, 47.48 de ýrea privativa, 0.00 de ýrea do terreno,  2 qto(s), WC, 1 sala(s), cozinha.","encerramento":null,"ocupacao":"desconhecido","fonte":"Caixa Econômica","link":"Leilýo SFI - Edital ýnico","novo":false,"prioridade":false,"score":33},{"id":"caixa-8787708168144","tipo":"Imóvel","bairro":"Bonfim (Almirante Tamandare)","endereco":"RUA ALFREDO DE ANDRADE, N. 75, Apto 406, BL 30  VG 1043","lance":190000,"avaliacao":177000,"desconto":0,"modalidade":"Apartamento, 45.48 de ýrea total, 40.00 de ýrea privativa, 0.00 de ýrea do terreno,  2 qto(s), WC, 1 sala(s), cozinha, 1 vaga(s) de garagem.","encerramento":null,"ocupacao":"desconhecido","fonte":"Caixa Econômica","link":"Leilýo SFI - Edital ýnico","novo":false,"prioridade":false,"score":33},{"id":"caixa-8444421533421","tipo":"Imóvel","bairro":"Campo De Santana","endereco":"RUA  VADISLAU BURGINSKI VARCHAKI, N. 360, CS 02","lance":197000,"avaliacao":197000,"desconto":0,"modalidade":"Casa, 0.00 de ýrea total, 41.00 de ýrea privativa, 70.00 de ýrea do terreno,  2 qto(s), WC, 1 sala(s), cozinha, 1 vaga(s) de garagem.","encerramento":null,"ocupacao":"desconhecido","fonte":"Caixa Econômica","link":"Leilýo SFI - Edital ýnico","novo":false,"prioridade":false,"score":33},{"id":"caixa-8787705087968","tipo":"Imóvel","bairro":"Bom Jesus (Campo Largo)","endereco":"RODOVIA DOS EXPEDICIONARIOS, N. 1145, Apto 2618, BL 26  VG 750","lance":198884,"avaliacao":198884,"desconto":0,"modalidade":"Apartamento, 0.00 de ýrea total, 40.31 de ýrea privativa, 0.00 de ýrea do terreno, 1 vaga(s) de garagem.","encerramento":null,"ocupacao":"desconhecido","fonte":"Caixa Econômica","link":"Leilýo SFI - Edital ýnico","novo":false,"prioridade":false,"score":33},{"id":"caixa-8787709668116","tipo":"Imóvel","bairro":"Bom Jesus (Campo Largo)","endereco":"RODOVIA DOS EXPEDICIONARIOS, N. 1145, Apto 724, 2 PAV BL 07","lance":198884,"avaliacao":198884,"desconto":0,"modalidade":"Apartamento, 0.00 de ýrea total, 52.81 de ýrea privativa, 0.00 de ýrea do terreno,  2 qto(s), WC, 1 sala(s), cozinha, 1 vaga(s) de garagem.","encerramento":null,"ocupacao":"desconhecido","fonte":"Caixa Econômica","link":"Leilýo SFI - Edital ýnico","novo":false,"prioridade":false,"score":33},{"id":"caixa-8444428113568","tipo":"Imóvel","bairro":"Thomaz Coelho (Araucaria)","endereco":"RUA PASCOAL FERNANDES LEITE, N. 30, Apto 13,","lance":205460.84,"avaliacao":200000,"desconto":0,"modalidade":"Apartamento, 54.21 de ýrea total, 48.52 de ýrea privativa, 0.00 de ýrea do terreno,  2 qto(s).","encerramento":null,"ocupacao":"desconhecido","fonte":"Caixa Econômica","link":"Leilýo SFI - Edital ýnico","novo":false,"prioridade":false,"score":33},{"id":"caixa-8787708110499","tipo":"Imóvel","bairro":"Tindiquera (Araucaria)","endereco":"RUA MARIA SOBANIA, N. 72, Apto 404, BL 3B  VG 151","lance":208000,"avaliacao":208000,"desconto":0,"modalidade":"Apartamento, 46.51 de ýrea total, 38.40 de ýrea privativa, 0.00 de ýrea do terreno,  2 qto(s), WC, 1 sala(s), cozinha, 1 vaga(s) de garagem.","encerramento":null,"ocupacao":"desconhecido","fonte":"Caixa Econômica","link":"Leilýo SFI - Edital ýnico","novo":false,"prioridade":false,"score":33},{"id":"caixa-8444422772055","tipo":"Imóvel","bairro":"Campo De Santana","endereco":"RUA JOAO AMILTON GOMES, N. 39, CS 02","lance":208000,"avaliacao":208000,"desconto":0,"modalidade":"Casa, 36.89 de ýrea total, 36.89 de ýrea privativa, 49.12 de ýrea do terreno,  2 qto(s), a.serv, WC, 1 sala(s), cozinha, 1 vaga(s) de garagem.","encerramento":null,"ocupacao":"desconhecido","fonte":"Caixa Econômica","link":"Leilýo SFI - Edital ýnico","novo":false,"prioridade":false,"score":33},{"id":"caixa-8787718024536","tipo":"Imóvel","bairro":"Campo De Santana","endereco":"RUA MELANIA ZENI VISINONI, N. 150, Apto 101, BL 8","lance":209000,"avaliacao":209000,"desconto":0,"modalidade":"Apartamento, 38.68 de ýrea total, 38.68 de ýrea privativa, 0.00 de ýrea do terreno,  2 qto(s), WC, 1 sala(s), cozinha.","encerramento":null,"ocupacao":"desconhecido","fonte":"Caixa Econômica","link":"Leilýo SFI - Edital ýnico","novo":false,"prioridade":false,"score":33},{"id":"caixa-8787708912463","tipo":"Imóvel","bairro":"Tindiquera (Araucaria)","endereco":"RUA MARIA SOBANIA, N. 72, Apto 403, BL 2A","lance":217000,"avaliacao":217000,"desconto":0,"modalidade":"Apartamento, 46.51 de ýrea total, 38.40 de ýrea privativa, 0.00 de ýrea do terreno,  2 qto(s), WC, 1 sala(s), cozinha, 1 vaga(s) de garagem.","encerramento":null,"ocupacao":"desconhecido","fonte":"Caixa Econômica","link":"Leilýo SFI - Edital ýnico","novo":false,"prioridade":false,"score":33},{"id":"caixa-8555536950051","tipo":"Imóvel","bairro":"Costeira (Araucaria)","endereco":"RUA JOSE GONDEK, N. 133, Apto 36, BL B  VG 28","lance":218000,"avaliacao":218000,"desconto":0,"modalidade":"Apartamento, 55.34 de ýrea total, 49.25 de ýrea privativa, 0.00 de ýrea do terreno,  2 qto(s), WC, 1 sala(s), cozinha, 1 vaga(s) de garagem.","encerramento":null,"ocupacao":"desconhecido","fonte":"Caixa Econômica","link":"Leilýo SFI - Edital ýnico","novo":false,"prioridade":false,"score":33},{"id":"caixa-8555531710290","tipo":"Imóvel","bairro":"Costeira (Araucaria)","endereco":"RUA JOSE GONDEK, N. 133, Apto 26, BL C","lance":220000,"avaliacao":220000,"desconto":0,"modalidade":"Apartamento, 67.34 de ýrea total, 49.25 de ýrea privativa, 0.00 de ýrea do terreno,  2 qto(s), WC, 1 sala(s), cozinha, 1 vaga(s) de garagem.","encerramento":null,"ocupacao":"desconhecido","fonte":"Caixa Econômica","link":"Leilýo SFI - Edital ýnico","novo":false,"prioridade":false,"score":33},{"id":"caixa-8444426134010","tipo":"Imóvel","bairro":"Tatuquara","endereco":"RUA ANTONIO ZANON, N. 1330, CS 5","lance":220000,"avaliacao":220000,"desconto":0,"modalidade":"Casa, 41.10 de ýrea total, 41.10 de ýrea privativa, 78.23 de ýrea do terreno,  2 qto(s), a.serv, WC, 1 sala(s), cozinha, 1 vaga(s) de garagem.","encerramento":null,"ocupacao":"desconhecido","fonte":"Caixa Econômica","link":"Leilýo SFI - Edital ýnico","novo":false,"prioridade":false,"score":33},{"id":"caixa-8555539769463","tipo":"Imóvel","bairro":"Palmital (Colombo)","endereco":"RUA ALIPIO DA SILVA, N. 301, Apto 33","lance":230000,"avaliacao":230000,"desconto":0,"modalidade":"Apartamento, 0.00 de ýrea total, 46.31 de ýrea privativa, 0.00 de ýrea do terreno,  2 qto(s), WC, 1 sala(s), cozinha, 1 vaga(s) de garagem.","encerramento":null,"ocupacao":"desconhecido","fonte":"Caixa Econômica","link":"Leilýo SFI - Edital ýnico","novo":false,"prioridade":false,"score":33},{"id":"caixa-8787704468682","tipo":"Imóvel","bairro":"Estados (Fazenda Rio Grande)","endereco":"AVENIDA RIO AMAZONAS, N. 3341, UN 198 LT 9AB","lance":230000,"avaliacao":230000,"desconto":0,"modalidade":"Casa, 43.00 de ýrea total, 43.00 de ýrea privativa, 128.80 de ýrea do terreno,  2 qto(s), a.serv, WC, 1 sala(s), cozinha, 1 vaga(s) de garagem.","encerramento":null,"ocupacao":"desconhecido","fonte":"Caixa Econômica","link":"Leilýo SFI - Edital ýnico","novo":false,"prioridade":false,"score":33},{"id":"caixa-8555523551773","tipo":"Imóvel","bairro":"Campo De Santana","endereco":"RUA ANGELO TOZIM, N. 1399, Apto 01, BL 17","lance":234800,"avaliacao":234800,"desconto":0,"modalidade":"Apartamento, 60.51 de ýrea total, 44.14 de ýrea privativa, 0.00 de ýrea do terreno,  1 qto(s), WC, 1 vaga(s) de garagem.","encerramento":null,"ocupacao":"desconhecido","fonte":"Caixa Econômica","link":"Leilýo SFI - Edital ýnico","novo":false,"prioridade":false,"score":33},{"id":"caixa-8555519266938","tipo":"Imóvel","bairro":"Jardim Rivabem (Campo Largo)","endereco":"RUA DAS BANDEIRAS, N. 732, CS 01 LT 13 QD L","lance":240000,"avaliacao":240000,"desconto":0,"modalidade":"Casa, 0.00 de ýrea total, 54.30 de ýrea privativa, 95.88 de ýrea do terreno,  2 qto(s), WC, 1 sala(s), cozinha.","encerramento":null,"ocupacao":"desconhecido","fonte":"Caixa Econômica","link":"Leilýo SFI - Edital ýnico","novo":false,"prioridade":false,"score":33},{"id":"caixa-8787704936449","tipo":"Imóvel","bairro":"Colonia Rio Grande (Sao Jose Dos Pinhais)","endereco":"RUA HUGO ZEN, N. 78, Apto 102, BL 16","lance":245000,"avaliacao":245000,"desconto":0,"modalidade":"Apartamento, 0.00 de ýrea total, 38.68 de ýrea privativa, 0.00 de ýrea do terreno,  2 qto(s), WC, 1 sala(s), cozinha.","encerramento":null,"ocupacao":"desconhecido","fonte":"Caixa Econômica","link":"Leilýo SFI - Edital ýnico","novo":false,"prioridade":false,"score":33},{"id":"caixa-1444419901577","tipo":"Imóvel","bairro":"Veneza (Fazenda Rio Grande)","endereco":"RUA MANUEL BANDEIRA, N. 78, UNIDADE 03","lance":250000,"avaliacao":250000,"desconto":0,"modalidade":"Casa, 49.85 de ýrea total, 49.85 de ýrea privativa, 120.00 de ýrea do terreno,  2 qto(s), a.serv, WC, 1 sala(s), cozinha.","encerramento":null,"ocupacao":"desconhecido","fonte":"Caixa Econômica","link":"Leilýo SFI - Edital ýnico","novo":false,"prioridade":false,"score":33},{"id":"caixa-8555513213085","tipo":"Imóvel","bairro":"Costeira (Araucaria)","endereco":"RUA MINAS GERAIS, N. 3349, 03","lance":266000,"avaliacao":266000,"desconto":0,"modalidade":"Casa, 41.75 de ýrea total, 41.75 de ýrea privativa, 114.65 de ýrea do terreno,  2 qto(s), a.serv, WC, 1 sala(s), cozinha.","encerramento":null,"ocupacao":"desconhecido","fonte":"Caixa Econômica","link":"Leilýo SFI - Edital ýnico","novo":false,"prioridade":false,"score":33},{"id":"caixa-8555518632981","tipo":"Imóvel","bairro":"Ina (Sao Jose Dos Pinhais)","endereco":"RUA ANNELIESE GELLERT KRIGSNER, N. 3074, Apto 28, BL 03","lance":267000,"avaliacao":267000,"desconto":0,"modalidade":"Apartamento, 0.00 de ýrea total, 52.61 de ýrea privativa, 0.00 de ýrea do terreno,  3 qto(s), a.serv, WC, 1 sala(s), cozinha, 1 vaga(s) de garagem.","encerramento":null,"ocupacao":"desconhecido","fonte":"Caixa Econômica","link":"Leilýo SFI - Edital ýnico","novo":false,"prioridade":false,"score":33},{"id":"caixa-8444409292223","tipo":"Imóvel","bairro":"Estacao (Araucaria)","endereco":"RUA IRINEU CHEMPCEK, N. 301, CS 05","lance":275000,"avaliacao":275000,"desconto":0,"modalidade":"Casa, 0.00 de ýrea total, 57.68 de ýrea privativa, 92.40 de ýrea do terreno,  3 qto(s), WC, 1 sala(s), cozinha.","encerramento":null,"ocupacao":"desconhecido","fonte":"Caixa Econômica","link":"Leilýo SFI - Edital ýnico","novo":false,"prioridade":false,"score":33},{"id":"caixa-8555518268031","tipo":"Imóvel","bairro":"Capao Raso","endereco":"RUA ATILIO BRUNETTI, N. 599, Apto 32, BL 11","lance":285000,"avaliacao":285000,"desconto":0,"modalidade":"Apartamento, 56.32 de ýrea total, 51.44 de ýrea privativa, 0.00 de ýrea do terreno,  3 qto(s), WC, 1 sala(s), cozinha.","encerramento":null,"ocupacao":"desconhecido","fonte":"Caixa Econômica","link":"Leilýo SFI - Edital ýnico","novo":false,"prioridade":false,"score":33},{"id":"caixa-1787701381502","tipo":"Imóvel","bairro":"Uberaba","endereco":"AVENIDA COMENDADOR FRANCO, N. 7770, Apto 201, TR 02  VG 220","lance":295000,"avaliacao":295000,"desconto":0,"modalidade":"Apartamento, 58.08 de ýrea total, 42.08 de ýrea privativa, 0.00 de ýrea do terreno,  2 qto(s), WC, 1 sala(s), cozinha, 1 vaga(s) de garagem.","encerramento":null,"ocupacao":"desconhecido","fonte":"Caixa Econômica","link":"Leilýo SFI - Edital ýnico","novo":false,"prioridade":false,"score":33},{"id":"caixa-1555524925652","tipo":"Imóvel","bairro":"Santa Candida","endereco":"RUA FERNANDO DE NORONHA, N. 933, Apto 205, BL 01","lance":300000,"avaliacao":300000,"desconto":0,"modalidade":"Apartamento, 0.00 de ýrea total, 48.35 de ýrea privativa, 0.00 de ýrea do terreno,  2 qto(s), WC, cozinha, 1 vaga(s) de garagem.","encerramento":null,"ocupacao":"desconhecido","fonte":"Caixa Econômica","link":"Leilýo SFI - Edital ýnico","novo":false,"prioridade":false,"score":33},{"id":"caixa-1555518050585","tipo":"Imóvel","bairro":"Cachoeira (Araucaria)","endereco":"RUA LEONARDO JOAO WIECZORKOWSKI, N. 47, RESIDENCIA 02","lance":316000,"avaliacao":316000,"desconto":0,"modalidade":"Casa, 48.06 de ýrea total, 48.06 de ýrea privativa, 93.62 de ýrea do terreno,  2 qto(s), a.serv, WC, 1 sala(s), cozinha.","encerramento":null,"ocupacao":"desconhecido","fonte":"Caixa Econômica","link":"Leilýo SFI - Edital ýnico","novo":false,"prioridade":false,"score":33},{"id":"caixa-10312585","tipo":"Imóvel","bairro":"Alto Boqueirao","endereco":"RUA LEOCýDIO ROBINSON DE LIMA DAMýZIO, N. 144, Apto 203","lance":325000,"avaliacao":325000,"desconto":0,"modalidade":"Apartamento, 0.00 de ýrea total, 58.55 de ýrea privativa, 0.00 de ýrea do terreno, 1 vaga(s) de garagem.","encerramento":null,"ocupacao":"desconhecido","fonte":"Caixa Econômica","link":"Leilýo SFI - Edital ýnico","novo":false,"prioridade":false,"score":33},{"id":"caixa-8444422613216","tipo":"Imóvel","bairro":"Eucaliptos (Fazenda Rio Grande)","endereco":"RUA MACADAMIA, N. 298, RESIDENCIA 02","lance":335000,"avaliacao":335000,"desconto":0,"modalidade":"Casa, 0.00 de ýrea total, 62.90 de ýrea privativa, 132.22 de ýrea do terreno,  2 qto(s), WC, 1 sala(s), cozinha, 1 vaga(s) de garagem.","encerramento":null,"ocupacao":"desconhecido","fonte":"Caixa Econômica","link":"Leilýo SFI - Edital ýnico","novo":false,"prioridade":false,"score":33},{"id":"caixa-8037400518816","tipo":"Imóvel","bairro":"Campina Da Barra (Araucaria)","endereco":"RUA PROFESSORA MARIA NASSAR SCHAUSTEK, N. 1154, CS 01","lance":345000,"avaliacao":345000,"desconto":0,"modalidade":"Casa, 62.05 de ýrea total, 62.05 de ýrea privativa, 121.22 de ýrea do terreno,  3 qto(s), a.serv, WC, 1 sala(s), cozinha.","encerramento":null,"ocupacao":"desconhecido","fonte":"Caixa Econômica","link":"Leilýo SFI - Edital ýnico","novo":false,"prioridade":false,"score":33},{"id":"caixa-8444435489942","tipo":"Imóvel","bairro":"Gralha Azul (Fazenda Rio Grande)","endereco":"RUA IRERE, N. 514, 07  11B","lance":363526.09,"avaliacao":200000,"desconto":0,"modalidade":"Casa, 151.17 de ýrea total, 45.50 de ýrea privativa, 81.00 de ýrea do terreno,  2 qto(s), a.serv, WC, 1 sala(s), cozinha, 1 vaga(s) de garagem.","encerramento":null,"ocupacao":"desconhecido","fonte":"Caixa Econômica","link":"Leilýo SFI - Edital ýnico","novo":false,"prioridade":false,"score":33},{"id":"caixa-1444420431732","tipo":"Imóvel","bairro":"Bacacheri","endereco":"RUA VINTE E NOVE DE JUNHO, N. 207, Apto 33, PAV 03 BL B LT A2","lance":814678.23,"avaliacao":774341.93,"desconto":0,"modalidade":"Apartamento, 113.26 de ýrea total, 86.80 de ýrea privativa, 0.00 de ýrea do terreno,  3 qto(s).","encerramento":null,"ocupacao":"desconhecido","fonte":"Caixa Econômica","link":"Leilýo SFI - Edital ýnico","novo":false,"prioridade":false,"score":33},{"id":"caixa-1444410448055","tipo":"Imóvel","bairro":"Jardim Das Americas","endereco":"RUA JOAO JOSE ZATTAR, N. 80, SOBRADO 03","lance":960000,"avaliacao":960000,"desconto":0,"modalidade":"Casa, 0.00 de ýrea total, 164.67 de ýrea privativa, 377.10 de ýrea do terreno,  4 qto(s), a.serv, WC, 2 sala(s), 1 lavabo(s), cozinha, Terraco.","encerramento":null,"ocupacao":"desconhecido","fonte":"Caixa Econômica","link":"Leilýo SFI - Edital ýnico","novo":false,"prioridade":false,"score":33},{"id":"caixa-1444420429533","tipo":"Imóvel","bairro":"Nucleo Colonial De Pinhais (Pinhais)","endereco":"RUA CASSIANO RICARDO, N. 1337, LT 684A2","lance":1049030.5,"avaliacao":836000,"desconto":0,"modalidade":"Casa, 0.00 de ýrea total, 239.12 de ýrea privativa, 412.50 de ýrea do terreno.","encerramento":null,"ocupacao":"desconhecido","fonte":"Caixa Econômica","link":"Leilýo SFI - Edital ýnico","novo":false,"prioridade":false,"score":33},{"id":"zuk-236643","tipo":"Casa","bairro":"Capão Raso","endereco":"Rua Adel Raad,  74","lance":705858.3,"avaliacao":705858.3,"desconto":null,"modalidade":"Leilão","encerramento":"2026-11-09","ocupacao":"ocupado","area":"206,50m² construída","fonte":"Portal Zuk","link":"https://www.portalzuk.com.br/imovel/pr/curitiba/capao-raso/rua-adel-raad-74/37871-236643","novo":false,"prioridade":false,"precoM2":3418,"score":26}];
+
+    let currentSort = 'score';
+    let visibleCount = 24;
+    let filteredData = [];
+
+    function getTypeEmoji(tipo) {
+      const l = tipo.toLowerCase();
+      if (l.includes('apartamento')) return '🏢';
+      if (l.includes('casa') || l.includes('sobrado')) return '🏠';
+      if (l.includes('terreno')) return '🗺️';
+      if (l.includes('comercial') || l.includes('sala')) return '🏪';
+      return '🏘️';
+    }
+
+    function fmtCurrency(v) {
+      return 'R$' + v.toLocaleString('pt-BR', { minimumFractionDigits: 0 });
+    }
+
+    function fmtDate(d) {
+      if (!d) return '';
+      const dt = new Date(d);
+      return dt.toLocaleDateString('pt-BR');
+    }
+
+    function renderCard(p, isTop) {
+      const typeEmoji = getTypeEmoji(p.tipo);
+      const discountClass = p.desconto && p.desconto >= 60 ? 'hot' : '';
+      const classes = ['card', isTop ? 'top' : '', p.prioridade ? 'priority' : '', p.novo ? 'new' : ''].filter(Boolean).join(' ');
+
+      const scoreVal = p.score || 0;
+      const scoreClass = scoreVal >= 60 ? 'score-high' : scoreVal >= 40 ? 'score-mid' : 'score-low';
+      const scoreBadge = scoreVal > 0 ? '<span class="score-badge ' + scoreClass + '">' + scoreVal + '/100</span>' : '';
+
+      let m2Html = '';
+      if (p.precoM2) {
+        const m2Fmt = 'R$' + p.precoM2.toLocaleString('pt-BR') + '/m²';
+        let comp = '';
+        if (p.mediaM2Bairro && p.descontoReal !== undefined) {
+          const cls = p.descontoReal >= 0 ? 'm2-below' : 'm2-above';
+          const txt = p.descontoReal >= 0
+            ? p.descontoReal + '% abaixo (méd. R$' + p.mediaM2Bairro.toLocaleString('pt-BR') + '/m²)'
+            : Math.abs(p.descontoReal) + '% ACIMA (méd. R$' + p.mediaM2Bairro.toLocaleString('pt-BR') + '/m²)';
+          comp = '<span class="m2-comparison ' + cls + '">' + txt + '</span>';
+        }
+        m2Html = '<div class="m2-info"><span class="m2-value">' + m2Fmt + '</span>' + comp + '</div>';
+      }
+
+      const vagasTag = p.vagas !== undefined
+        ? (p.vagas > 0 ? '<span class="meta-tag">🅿️ ' + p.vagas + ' vaga' + (p.vagas > 1 ? 's' : '') + '</span>' : '<span class="meta-tag" style="background:#da3633;color:#fff">⛔ 0 vagas</span>')
+        : '';
+      const quartosTag = p.quartos ? '<span class="meta-tag">🛏️ ' + p.quartos + ' qto' + (p.quartos > 1 ? 's' : '') + '</span>' : '';
+      const alertTags = (p.alertas || []).filter(a => !a.includes('SEM VAGAS')).map(a => '<span class="meta-tag" style="background:#d29922;color:#000">' + a + '</span>').join('');
+
+      return '<div class="' + classes + '">' +
+        '<div class="card-header">' +
+          '<div class="card-title">' + scoreBadge + typeEmoji + ' ' + p.tipo + ' - ' + p.bairro + '</div>' +
+          (p.desconto ? '<div class="card-discount ' + discountClass + '">-' + p.desconto + '%</div>' : '') +
+        '</div>' +
+        '<div class="card-location">📍 ' + p.endereco + '</div>' +
+        '<div class="card-prices">' +
+          '<div class="price-item"><div class="price-label">' + p.modalidade + '</div><div class="price-value">' + fmtCurrency(p.lance) + '</div></div>' +
+          (p.avaliacao ? '<div class="price-item"><div class="price-label">Avaliação</div><div class="price-value original">' + fmtCurrency(p.avaliacao) + '</div></div>' : '') +
+        '</div>' +
+        m2Html +
+        '<div class="card-meta">' + quartosTag + vagasTag +
+          (p.area ? '<span class="meta-tag">' + p.area + '</span>' : '') +
+          (p.encerramento ? '<span class="meta-tag">Encerramento: ' + fmtDate(p.encerramento) + '</span>' : '') +
+          (p.ocupacao === 'ocupado' ? '<span class="meta-tag">⚠️ Ocupado</span>' : '') +
+          (p.ocupacao === 'desocupado' ? '<span class="meta-tag">✅ Desocupado</span>' : '') +
+          (p.semVagas ? '<span class="meta-tag" style="background:#da3633;color:#fff">⛔ SEM VAGAS</span>' : '') +
+          alertTags +
+        '</div>' +
+        '<a href="' + p.link + '" target="_blank" class="card-link">Ver no ' + p.fonte + ' →</a>' +
+      '</div>';
+    }
+
+    function sortData(data, sortKey) {
+      const sorted = [...data];
+      switch (sortKey) {
+        case 'score': sorted.sort((a, b) => (b.score || 0) - (a.score || 0)); break;
+        case 'price-asc': sorted.sort((a, b) => a.lance - b.lance); break;
+        case 'price-desc': sorted.sort((a, b) => b.lance - a.lance); break;
+        case 'discount': sorted.sort((a, b) => (b.desconto || 0) - (a.desconto || 0)); break;
+        case 'm2': sorted.sort((a, b) => (a.precoM2 || 99999) - (b.precoM2 || 99999)); break;
+        case 'real-discount': sorted.sort((a, b) => (b.descontoReal || -999) - (a.descontoReal || -999)); break;
+      }
+      return sorted;
+    }
+
+    function applyFilters() {
+      const search = document.getElementById('filterSearch').value.toLowerCase();
+      const type = document.getElementById('filterType').value;
+      const hood = document.getElementById('filterNeighborhood').value;
+      const minScore = parseInt(document.getElementById('filterScore').value) || 0;
+      const maxPrice = parseInt(document.getElementById('filterMaxPrice').value) || 0;
+      const source = document.getElementById('filterSource').value;
+
+      filteredData = ALL_PROPERTIES.filter(p => {
+        if (search && !(p.bairro.toLowerCase().includes(search) || p.endereco.toLowerCase().includes(search) || p.tipo.toLowerCase().includes(search))) return false;
+        if (type && p.tipo !== type) return false;
+        if (hood && p.bairro !== hood) return false;
+        if (minScore && (p.score || 0) < minScore) return false;
+        if (maxPrice && p.lance > maxPrice) return false;
+        if (source && p.fonte !== source) return false;
+        return true;
+      });
+
+      filteredData = sortData(filteredData, currentSort);
+      visibleCount = 24;
+      renderCards();
+    }
+
+    function renderCards() {
+      const container = document.getElementById('cardsContainer');
+      const showing = filteredData.slice(0, visibleCount);
+      container.innerHTML = showing.length > 0
+        ? showing.map((p, i) => renderCard(p, i < 3 && currentSort === 'score')).join('')
+        : '<div class="no-results"><h3>Nenhum imóvel encontrado</h3><p>Tente ajustar os filtros</p></div>';
+      
+      document.getElementById('resultsCount').innerHTML = 
+        '<span>Mostrando <strong>' + Math.min(visibleCount, filteredData.length) + '</strong> de <strong>' + filteredData.length + '</strong> imóveis</span>' +
+        '<span style="font-size:0.8em;">(' + ALL_PROPERTIES.length + ' total no banco)</span>';
+
+      const btn = document.getElementById('loadMore');
+      btn.style.display = visibleCount < filteredData.length ? 'block' : 'none';
+      btn.textContent = 'Mostrar mais (' + (filteredData.length - visibleCount) + ' restantes)';
+    }
+
+    function loadMore() {
+      visibleCount += 24;
+      renderCards();
+    }
+
+    function setSort(key) {
+      currentSort = key;
+      document.querySelectorAll('.sort-btn').forEach(b => b.classList.toggle('active', b.dataset.sort === key));
+      filteredData = sortData(filteredData, key);
+      visibleCount = 24;
+      renderCards();
+    }
+
+    function resetFilters() {
+      document.getElementById('filterSearch').value = '';
+      document.getElementById('filterType').value = '';
+      document.getElementById('filterNeighborhood').value = '';
+      document.getElementById('filterScore').value = '0';
+      document.getElementById('filterMaxPrice').value = '0';
+      document.getElementById('filterSource').value = '';
+      applyFilters();
+    }
+
+    // Initialize
+    applyFilters();
+  </script>
+</body>
+</html>
